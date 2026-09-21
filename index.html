@@ -1,0 +1,2519 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Minecraft Bedrock Addon Lite Optimizer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root {
+  --bg: #0f1419;
+  --card: #1a2332;
+  --border: #2d3a4f;
+  --text: #e6edf3;
+  --muted: #8b9cb3;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --radius: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  padding: 12px;
+  max-width: 900px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+h1 { font-size: 1.4rem; margin-bottom: 4px; }
+.subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 16px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 32px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(59,130,246,0.05);
+}
+.drop-zone.dragover {
+  border-color: var(--accent);
+  background: rgba(59,130,246,0.15);
+}
+.drop-zone p {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--accent);
+  color: white;
+  width: 100%;
+  margin-top: 8px;
+}
+button:hover:not(:disabled) { background: var(--accent-hover); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.secondary { background: #334155; }
+button.success { background: var(--success); }
+button.danger { background: var(--danger); }
+button.warning { background: var(--warning); color: #000; }
+.version-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0;
+}
+.version-btn {
+  padding: 10px 8px;
+  background: #1e293b;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.8rem;
+  text-align: center;
+  cursor: pointer;
+}
+.version-btn.active {
+  border-color: var(--accent);
+  background: rgba(59,130,246,0.2);
+  color: #93c5fd;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin: 4px 0;
+}
+.info-row span:last-child {
+  color: var(--muted);
+  font-family: monospace;
+}
+.progress-bar {
+  height: 8px;
+  background: #1e293b;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #60a5fa);
+  width: 0%;
+  transition: width 0.2s;
+}
+.log-box {
+  background: #0b1220;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  color: #94a3b8;
+}
+.log-box .ok { color: var(--success); }
+.log-box .warn { color: var(--warning); }
+.log-box .err { color: var(--danger); }
+.file-list {
+  max-height: 280px;
+  overflow-y: auto;
+  font-size: 0.8rem;
+}
+.file-item {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.file-item.delete { background: rgba(239,68,68,0.1); }
+.file-item.optimize { background: rgba(245,158,11,0.1); }
+.file-item.keep { background: rgba(34,197,94,0.08); }
+.badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.badge.delete { background: var(--danger); }
+.badge.optimize { background: var(--warning); color: #000; }
+.badge.keep { background: var(--success); }
+.size-big {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #93c5fd;
+}
+.hidden { display: none !important; }
+.note {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 8px;
+}
+@media (min-width: 600px) {
+  .version-grid { grid-template-columns: repeat(4, 1fr); }
+  button { width: auto; min-width: 140px; }
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+</style>
+</head>
+
+<body>
+  <h1>⚡ Addon Lite Optimizer</h1>
+  <p class="subtitle">
+    Tối ưu Minecraft Bedrock Addon → bản Lite nhẹ hơn (chạy 100% local)
+  </p>
+
+  <div class="card">
+    <div class="drop-zone" id="dropZone">
+      <p style="font-size:1.1rem;margin-bottom:6px">
+        📁 Kéo thả file .mcaddon / .mcpack / .zip
+      </p>
+      <p>hoặc bấm để chọn • Tối đa 200 MB</p>
+      <input
+        type="file"
+        id="fileInput"
+        accept=".mcaddon,.mcpack,.zip,application/zip"
+        hidden
+      >
+    </div>
+
+    <div id="fileInfo" class="hidden" style="margin-top:12px">
+      <div class="info-row">
+        <span>Tên file</span>
+        <span id="fileName">—</span>
+      </div>
+      <div class="info-row">
+        <span>Dung lượng</span>
+        <span id="fileSize">—</span>
+      </div>
+      <div class="info-row">
+        <span>Loại</span>
+        <span id="fileType">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <strong>Phiên bản Minecraft mục tiêu</strong>
+
+    <div class="version-grid" id="versionGrid">
+      <div class="version-btn" data-v="1.26.3">1.26.3</div>
+      <div class="version-btn active" data-v="1.26.30">1.26.30</div>
+      <div class="version-btn" data-v="1.21.30">1.21.30</div>
+      <div class="version-btn" data-v="1.26.33">1.26.33</div>
+    </div>
+
+    <p class="note">
+      Phiên bản chỉ dùng để tham khảo tương thích. Không tự sửa
+      min_engine_version hoặc schema/API.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="btn-row">
+      <button id="btnAnalyze" disabled>🔍 Phân tích addon</button>
+      <button id="btnAI" class="warning" disabled>🤖 Tạo bản Lite bằng AI</button>
+      <button id="btnApply" class="success hidden" disabled>✅ Áp dụng tối ưu hóa</button>
+      <button id="btnDownload" class="success hidden" disabled>⬇️ Tải bản Lite</button>
+      <button id="btnCancel" class="danger secondary hidden">⏹ Hủy</button>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div id="statusText" style="font-size:0.85rem;color:var(--muted)">
+      Chưa có file
+    </div>
+  </div>
+
+  <div class="card hidden" id="sizeCard">
+    <div class="info-row">
+      <span>Dung lượng gốc (archive)</span>
+      <span id="sizeOrig" class="size-big">—</span>
+    </div>
+
+    <div class="info-row">
+      <span>Sau tối ưu (archive)</span>
+      <span id="sizeNew" class="size-big">—</span>
+    </div>
+
+    <div class="info-row">
+      <span>Đã giảm</span>
+      <span id="sizeSaved" class="size-big">—</span>
+    </div>
+
+    <div class="info-row">
+      <span>File giữ / tối ưu / xóa</span>
+      <span id="sizeStats">—</span>
+    </div>
+  </div>
+
+  <div class="card hidden" id="proposalCard">
+    <strong>Đề xuất thay đổi (xem kỹ trước khi áp dụng)</strong>
+
+    <p class="note">
+      Màu đỏ = xóa file rác chắc chắn • Vàng = tối ưu an toàn • Xanh = giữ nguyên
+    </p>
+
+    <div class="file-list" id="proposalList"></div>
+  </div>
+
+  <div class="card">
+    <strong>Log xử lý</strong>
+    <div class="log-box" id="logBox">Sẵn sàng...</div>
+  </div>
+
+  <p class="note" style="margin-top:16px;text-align:center">
+    ⚠️ Bản Lite là heuristic. Luôn backup addon gốc và test kỹ trong game.<br>
+    Không xóa asset chỉ vì scanner không tìm thấy reference.
+  </p>
+
+<script>
+(() => {
+  "use strict";
+
+  let originalFile = null;
+  let originalZip = null;
+  let originalSize = 0;
+  let selectedVersion = "1.26.30";
+
+  let analysisResult = null;
+  let optimizedBlob = null;
+  let optimizedName = "";
+
+  let isProcessing = false;
+  let abortController = null;
+  let wasAborted = false;
+
+  /*
+   * Mỗi operation có một ID riêng.
+   * Điều này ngăn operation cũ ghi đè UI/state
+   * sau khi người dùng bắt đầu operation mới.
+   */
+  let operationSerial = 0;
+  let activeOperationId = 0;
+
+  const MAX_SIZE = 200 * 1024 * 1024;
+
+  const dropZone = document.getElementById("dropZone");
+  const fileInput = document.getElementById("fileInput");
+  const fileInfo = document.getElementById("fileInfo");
+  const fileNameEl = document.getElementById("fileName");
+  const fileSizeEl = document.getElementById("fileSize");
+  const fileTypeEl = document.getElementById("fileType");
+
+  const btnAnalyze = document.getElementById("btnAnalyze");
+  const btnAI = document.getElementById("btnAI");
+  const btnApply = document.getElementById("btnApply");
+  const btnDownload = document.getElementById("btnDownload");
+  const btnCancel = document.getElementById("btnCancel");
+
+  const progressFill = document.getElementById("progressFill");
+  const statusText = document.getElementById("statusText");
+  const logBox = document.getElementById("logBox");
+
+  const sizeCard = document.getElementById("sizeCard");
+  const proposalCard = document.getElementById("proposalCard");
+  const proposalList = document.getElementById("proposalList");
+
+  function log(msg, type) {
+    const time = new Date().toLocaleTimeString();
+    const line = document.createElement("div");
+
+    if (type === "ok") {
+      line.className = "ok";
+    } else if (type === "warn") {
+      line.className = "warn";
+    } else if (type === "err") {
+      line.className = "err";
+    }
+
+    line.textContent = "[" + time + "] " + msg;
+    logBox.appendChild(line);
+
+    /*
+     * Giới hạn log để tránh một addon rất lớn
+     * tạo hàng nghìn DOM nodes và tốn RAM.
+     */
+    while (logBox.childNodes.length > 300) {
+      logBox.removeChild(logBox.firstChild);
+    }
+
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function setProgress(p) {
+    if (wasAborted) return;
+
+    progressFill.style.width =
+      Math.min(100, Math.max(0, p)) + "%";
+  }
+
+  function setStatus(t) {
+    statusText.textContent = t;
+  }
+
+  function formatSize(b) {
+    if (!Number.isFinite(b) || b < 0) return "—";
+    if (b < 1024) return b + " B";
+    if (b < 1048576) return (b / 1024).toFixed(1) + " KB";
+    return (b / 1048576).toFixed(2) + " MB";
+  }
+
+  function yieldToUI() {
+    return new Promise(function(resolve) {
+      setTimeout(resolve, 0);
+    });
+  }
+
+  function isCurrentOperation(id) {
+    return id === activeOperationId;
+  }
+
+  function checkAbort(id) {
+    if (
+      !isCurrentOperation(id) ||
+      !abortController ||
+      abortController.signal.aborted
+    ) {
+      wasAborted = true;
+      throw new Error("Aborted");
+    }
+  }
+
+  function beginOperation() {
+    operationSerial++;
+    activeOperationId = operationSerial;
+
+    if (abortController) {
+      try {
+        abortController.abort();
+      } catch (_) {}
+    }
+
+    abortController = new AbortController();
+    wasAborted = false;
+    isProcessing = true;
+
+    return activeOperationId;
+  }
+
+  function finishOperation(id) {
+    if (!isCurrentOperation(id)) return;
+
+    isProcessing = false;
+
+    if (abortController) {
+      abortController = null;
+    }
+
+    btnCancel.classList.add("hidden");
+  }
+
+  function normalizePath(p) {
+    return String(p || "")
+      .replace(/\\/g, "/")
+      .replace(/^\/+/, "")
+      .replace(/^\.\//, "")
+      .replace(/\/+/g, "/")
+      .replace(/\/$/, "")
+      .toLowerCase();
+  }
+
+  function isSafeArchivePath(name) {
+    const n = String(name || "").replace(/\\/g, "/");
+
+    if (!n) return false;
+    if (n.startsWith("/")) return false;
+
+    const parts = n.split("/");
+
+    for (const part of parts) {
+      if (part === "..") return false;
+    }
+
+    return true;
+  }
+
+  function getExtension(name) {
+    const base = String(name || "").split("/").pop();
+    const idx = base.lastIndexOf(".");
+
+    return idx >= 0
+      ? base.slice(idx + 1).toLowerCase()
+      : "";
+  }
+
+  function isMcpack(name) {
+    return /\.mcpack$/i.test(name);
+  }
+
+  function isManifest(name) {
+    return /(?:^|\/)manifest\.json$/i.test(name);
+  }
+
+  function isMcstructure(name) {
+    return /\.mcstructure$/i.test(name);
+  }
+
+  function isTextCandidate(name) {
+    const ext = getExtension(name);
+
+    return (
+      ext === "json" ||
+      ext === "js" ||
+      ext === "mcfunction" ||
+      ext === "lang" ||
+      ext === "txt"
+    );
+  }
+
+  async function simpleHash(uint8, id) {
+    checkAbort(id);
+
+    /*
+     * SHA-1 ở đây chỉ dùng để phát hiện nội dung giống nhau
+     * trong quá trình phân tích. Kết quả KHÔNG được dùng
+     * làm lý do tự động xóa asset.
+     */
+    const copy = uint8.buffer.slice(
+      uint8.byteOffset,
+      uint8.byteOffset + uint8.byteLength
+    );
+
+    try {
+      const dig = await crypto.subtle.digest("SHA-1", copy);
+
+      checkAbort(id);
+
+      return Array.from(new Uint8Array(dig))
+        .map(function(b) {
+          return b.toString(16).padStart(2, "0");
+        })
+        .join("");
+    } finally {
+      /*
+       * copy sẽ được GC khi không còn reference.
+       */
+    }
+  }
+
+  function stripJsonComments(str) {
+    let result = "";
+    let i = 0;
+    const len = str.length;
+
+    let inString = false;
+    let stringChar = "";
+    let escaped = false;
+
+    while (i < len) {
+      const ch = str[i];
+      const next = i + 1 < len ? str[i + 1] : "";
+
+      if (inString) {
+        result += ch;
+
+        if (escaped) {
+          escaped = false;
+        } else if (ch === "\\") {
+          escaped = true;
+        } else if (ch === stringChar) {
+          inString = false;
+        }
+
+        i++;
+        continue;
+      }
+
+      if (ch === '"' || ch === "'") {
+        inString = true;
+        stringChar = ch;
+        result += ch;
+        i++;
+        continue;
+      }
+
+      if (ch === "/" && next === "/") {
+        i += 2;
+
+        while (
+          i < len &&
+          str[i] !== "\n" &&
+          str[i] !== "\r"
+        ) {
+          i++;
+        }
+
+        continue;
+      }
+
+      if (ch === "/" && next === "*") {
+        i += 2;
+
+        while (
+          i < len - 1 &&
+          !(str[i] === "*" && str[i + 1] === "/")
+        ) {
+          i++;
+        }
+
+        if (i < len - 1) i += 2;
+        continue;
+      }
+
+      result += ch;
+      i++;
+    }
+
+    return result;
+  }
+
+  function safeJsonParse(str) {
+    return JSON.parse(stripJsonComments(str));
+  }
+
+  function buildRefIndex(text) {
+    const set = new Set();
+
+    let m;
+
+    const re1 =
+      /["']([a-zA-Z0-9_\-\.\/\\]+(?:\.(?:png|jpg|jpeg|tga|json|ogg|fsb|wav|mcfunction|js|lang))?)["']/gi;
+
+    while ((m = re1.exec(text)) !== null) {
+      const c = normalizePath(m[1]);
+
+      if (!c) continue;
+
+      set.add(c);
+      set.add(c.split("/").pop());
+
+      if (c.indexOf("/") !== -1) {
+        set.add(c.split("/").slice(-2).join("/"));
+      }
+    }
+
+    const re2 =
+      /(?:textures|models|sounds|animations|animation_controllers|entities|items|blocks|particles|ui|functions|loot_tables|recipes|spawn_rules|trading|dialogue|geometry|attachables)\/[a-zA-Z0-9_\-\.\/\\]+/gi;
+
+    while ((m = re2.exec(text)) !== null) {
+      set.add(normalizePath(m[0]));
+    }
+
+    const re3 =
+      /"(?:texture|textures|geometry|animation|animations|sound|particle|identifier)"\s*:\s*"([^"]+)"/gi;
+
+    while ((m = re3.exec(text)) !== null) {
+      set.add(normalizePath(m[1]));
+    }
+
+    return set;
+  }
+
+  /*
+   * Kiểm tra archive entry có path nguy hiểm hay không.
+   * Không tự sửa path; chỉ từ chối output nếu path không an toàn.
+   */
+  function validateZipEntries(zip) {
+    const names = Object.keys(zip.files);
+
+    for (const name of names) {
+      if (!isSafeArchivePath(name)) {
+        throw new Error(
+          "Archive chứa path không an toàn: " + name
+        );
+      }
+    }
+
+    return names;
+  }
+
+  async function loadZipSafely(input, id) {
+    checkAbort(id);
+
+    let zip;
+
+    try {
+      zip = await JSZip.loadAsync(input, {
+        checkCRC32: false,
+        createFolders: false
+      });
+    } catch (e) {
+      throw new Error(
+        "Archive/ZIP không đọc được hoặc có thể đã hỏng."
+      );
+    }
+
+    checkAbort(id);
+    validateZipEntries(zip);
+
+    return zip;
+  }
+
+  function resetState() {
+    /*
+     * Không reset khi operation đang chạy.
+     */
+    if (isProcessing) return;
+
+    originalZip = null;
+    analysisResult = null;
+    optimizedBlob = null;
+    optimizedName = "";
+    wasAborted = false;
+
+    proposalCard.classList.add("hidden");
+    sizeCard.classList.add("hidden");
+
+    btnApply.classList.add("hidden");
+    btnDownload.classList.add("hidden");
+
+    btnApply.disabled = true;
+    btnDownload.disabled = true;
+
+    while (proposalList.firstChild) {
+      proposalList.removeChild(proposalList.firstChild);
+    }
+
+    setProgress(0);
+  }
+
+  function handleFile(file) {
+    if (isProcessing) return;
+
+    resetState();
+
+    if (!/\.(mcaddon|mcpack|zip)$/i.test(file.name)) {
+      log(
+        "Chỉ hỗ trợ .mcaddon, .mcpack, .zip",
+        "err"
+      );
+      setStatus("File không hợp lệ");
+      return;
+    }
+
+    if (file.size > MAX_SIZE) {
+      log(
+        "File quá lớn: " +
+        formatSize(file.size) +
+        " > 200 MB",
+        "err"
+      );
+
+      setStatus("Vượt giới hạn 200 MB");
+      alert("File vượt quá 200 MB.");
+      return;
+    }
+
+    originalFile = file;
+    originalSize = file.size;
+
+    fileNameEl.textContent = file.name;
+    fileSizeEl.textContent = formatSize(file.size);
+    fileTypeEl.textContent =
+      file.name.split(".").pop().toUpperCase();
+
+    fileInfo.classList.remove("hidden");
+
+    btnAnalyze.disabled = false;
+    btnAI.disabled = false;
+
+    log(
+      "Đã chọn: " +
+      file.name +
+      " (" +
+      formatSize(file.size) +
+      ")",
+      "ok"
+    );
+
+    setStatus("Sẵn sàng phân tích");
+  }
+
+  dropZone.addEventListener("click", function() {
+    fileInput.click();
+  });
+
+  dropZone.addEventListener("dragover", function(e) {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+  });
+
+  dropZone.addEventListener("dragleave", function() {
+    dropZone.classList.remove("dragover");
+  });
+
+  dropZone.addEventListener("drop", function(e) {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+
+    if (e.dataTransfer.files.length) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput.addEventListener("change", function() {
+    if (fileInput.files.length) {
+      handleFile(fileInput.files[0]);
+    }
+  });
+
+  document.querySelectorAll(".version-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document
+        .querySelectorAll(".version-btn")
+        .forEach(function(b) {
+          b.classList.remove("active");
+        });
+
+      btn.classList.add("active");
+      selectedVersion = btn.dataset.v;
+
+      log(
+        "Chọn phiên bản mục tiêu: " +
+        selectedVersion
+      );
+    });
+  });
+
+  btnCancel.addEventListener("click", function() {
+    if (!isProcessing || !abortController) return;
+
+    wasAborted = true;
+
+    try {
+      abortController.abort();
+    } catch (_) {}
+
+    /*
+     * Invalidate operation ngay lập tức.
+     * Các continuation của operation cũ sẽ không được
+     * phép thay đổi UI/state nữa.
+     */
+    activeOperationId = ++operationSerial;
+
+    isProcessing = false;
+
+    btnCancel.classList.add("hidden");
+
+    setStatus("Đã hủy");
+    log("Người dùng hủy quá trình", "warn");
+
+    /*
+     * Không xóa originalZip/analysisResult tại đây.
+     * Chúng có thể vẫn được operation mới sử dụng an toàn.
+     */
+  });
+
+  /*
+   * ------------------------------------------------------------
+   * ANALYZE
+   * ------------------------------------------------------------
+   */
+
+  btnAnalyze.addEventListener("click", async function() {
+    if (!originalFile || isProcessing) return;
+
+    const opId = beginOperation();
+
+    btnCancel.classList.remove("hidden");
+    btnAnalyze.disabled = true;
+    btnAI.disabled = true;
+
+    setStatus("Đang đọc archive...");
+    log("Bắt đầu phân tích cấu trúc...");
+    setProgress(5);
+
+    try {
+      const zip = await loadZipSafely(originalFile, opId);
+      checkAbort(opId);
+
+      originalZip = zip;
+
+      const files = validateZipEntries(zip)
+        .filter(function(n) {
+          return !zip.files[n].dir;
+        });
+
+      if (!files.length) {
+        throw new Error(
+          "Archive không chứa file."
+        );
+      }
+
+      log(
+        "Tìm thấy " +
+        files.length +
+        " file trong archive"
+      );
+
+      const nestedMcpacks = files.filter(function(f) {
+        return isMcpack(f);
+      });
+
+      if (nestedMcpacks.length > 0) {
+        log(
+          "Phát hiện " +
+          nestedMcpacks.length +
+          " .mcpack bên trong archive",
+          "ok"
+        );
+
+        nestedMcpacks.forEach(function(p) {
+          log("  → " + p);
+        });
+      }
+
+      const manifests = files.filter(function(f) {
+        return isManifest(f);
+      });
+
+      log(
+        "Manifest tìm thấy: " +
+        manifests.length
+      );
+
+      let hasBP = false;
+      let hasRP = false;
+      let hasScript = false;
+
+      for (let mi = 0; mi < manifests.length; mi++) {
+        checkAbort(opId);
+
+        try {
+          const content =
+            await zip
+              .file(manifests[mi])
+              .async("string");
+
+          const json = safeJsonParse(content);
+          const mods = Array.isArray(json.modules)
+            ? json.modules
+            : [];
+
+          for (let j = 0; j < mods.length; j++) {
+            const type = mods[j] && mods[j].type;
+
+            if (type === "data") hasBP = true;
+            if (type === "resources") hasRP = true;
+            if (type === "script") hasScript = true;
+          }
+        } catch (e) {
+          log(
+            "Lỗi đọc " +
+            manifests[mi] +
+            ": " +
+            e.message,
+            "warn"
+          );
+        }
+
+        if (mi % 5 === 0) {
+          setProgress(
+            10 +
+            (mi / Math.max(1, manifests.length)) * 15
+          );
+
+          await yieldToUI();
+        }
+      }
+
+      log(
+        "BP: " +
+        (hasBP ? "Có" : "Không") +
+        " | RP: " +
+        (hasRP ? "Có" : "Không") +
+        " | Script: " +
+        (hasScript ? "Có" : "Không"),
+        "ok"
+      );
+
+      const extCount = {};
+      let totalUncompressed = 0;
+
+      for (let fi = 0; fi < files.length; fi++) {
+        checkAbort(opId);
+
+        const name = files[fi];
+        const ext = getExtension(name);
+
+        extCount[ext] =
+          (extCount[ext] || 0) + 1;
+
+        /*
+         * Chỉ đọc binary để lấy size thật.
+         * Không lưu data sau khi tính xong.
+         */
+        try {
+          const data =
+            await zip
+              .file(name)
+              .async("uint8array");
+
+          totalUncompressed += data.length;
+        } catch (_) {
+          log(
+            "Không đọc được: " + name,
+            "warn"
+          );
+        }
+
+        if (fi % 20 === 0) {
+          setProgress(
+            25 +
+            (fi / Math.max(1, files.length)) * 70
+          );
+
+          await yieldToUI();
+        }
+      }
+
+      log(
+        "Uncompressed thực tế: " +
+        formatSize(totalUncompressed)
+      );
+
+      const sortedExt =
+        Object.keys(extCount)
+          .sort(function(a, b) {
+            return extCount[b] - extCount[a];
+          })
+          .slice(0, 8);
+
+      log(
+        "Phân bố: " +
+        sortedExt
+          .map(function(e) {
+            return "." + e + ":" + extCount[e];
+          })
+          .join(", ")
+      );
+
+      checkAbort(opId);
+
+      setProgress(100);
+      setStatus(
+        "Phân tích xong. Có thể tạo bản Lite."
+      );
+
+      log(
+        "Phân tích cấu trúc hoàn tất.",
+        "ok"
+      );
+
+      btnAI.disabled = false;
+    } catch (err) {
+      if (err.message === "Aborted") {
+        if (isCurrentOperation(opId)) {
+          setStatus("Đã hủy");
+          log("Đã hủy phân tích", "warn");
+        }
+      } else {
+        if (isCurrentOperation(opId)) {
+          log(
+            "Lỗi phân tích: " +
+            err.message,
+            "err"
+          );
+          setStatus("Lỗi phân tích");
+        }
+      }
+    } finally {
+      if (isCurrentOperation(opId)) {
+        finishOperation(opId);
+        btnAnalyze.disabled = false;
+
+        /*
+         * Nếu đã có file thì AI vẫn có thể được dùng.
+         */
+        btnAI.disabled = !originalFile;
+      }
+    }
+  });
+
+  /*
+   * ------------------------------------------------------------
+   * OPTIMIZE ONE PACK
+   * ------------------------------------------------------------
+   */
+
+  async function optimizePackContents(
+    zip,
+    progressBase,
+    progressSpan,
+    opId
+  ) {
+    checkAbort(opId);
+
+    const allEntries =
+      validateZipEntries(zip)
+        .filter(function(n) {
+          return !zip.files[n].dir;
+        });
+
+    const totalFiles = allEntries.length;
+
+    if (!totalFiles) {
+      throw new Error(
+        "Pack không chứa file."
+      );
+    }
+
+    /*
+     * Reference index chỉ dùng để thông tin/đánh giá.
+     * Không dùng missing reference làm lý do xóa.
+     */
+    const referenced = new Set();
+
+    for (let i = 0; i < totalFiles; i++) {
+      checkAbort(opId);
+
+      const name = allEntries[i];
+
+      /*
+       * .mcstructure tuyệt đối không decode.
+       */
+      if (isTextCandidate(name) && !isMcstructure(name)) {
+        try {
+          const content =
+            await zip.file(name).async("string");
+
+          const refs = buildRefIndex(content);
+
+          refs.forEach(function(r) {
+            referenced.add(r);
+          });
+        } catch (_) {
+          /*
+           * Không đọc được text → KEEP.
+           */
+        }
+      }
+
+      if (i % 25 === 0) {
+        setProgress(
+          progressBase +
+          (i / totalFiles) *
+          (progressSpan * 0.30)
+        );
+
+        await yieldToUI();
+      }
+    }
+
+    const decisions = [];
+
+    /*
+     * Chỉ giữ hash trong operation hiện tại.
+     * Quan trọng: hash không còn là điều kiện auto-delete.
+     */
+    const hashCache = new Map();
+
+    for (let i = 0; i < totalFiles; i++) {
+      checkAbort(opId);
+
+      const fname = allEntries[i];
+      const entry = zip.files[fname];
+
+      let data = null;
+
+      try {
+        data =
+          await entry.async("uint8array");
+      } catch (e) {
+        /*
+         * Nếu đọc lỗi thì giữ nguyên entry.
+         */
+        decisions.push({
+          name: fname,
+          action: "keep",
+          reason: "Không đọc được để tối ưu → giữ nguyên",
+          origSize: 0,
+          newData: null,
+          newSize: null,
+          readError: true
+        });
+
+        continue;
+      }
+
+      const size = data.length;
+      const lower = fname.toLowerCase();
+      const base =
+        fname
+          .split("/")
+          .pop()
+          .toLowerCase();
+
+      let action = "keep";
+      let reason = "Giữ nguyên (an toàn)";
+      let newData = null;
+
+      /*
+       * --------------------------------------------------------
+       * HIGH-CONFIDENCE JUNK ONLY
+       * --------------------------------------------------------
+       */
+      if (
+        base === ".ds_store" ||
+        base === "thumbs.db" ||
+        base === "desktop.ini" ||
+        lower.indexOf("__macosx/") === 0 ||
+        lower.indexOf("/__macosx/") !== -1 ||
+        lower.indexOf("/.git/") !== -1 ||
+        lower.indexOf(".git/") === 0 ||
+        lower.endsWith(".tmp") ||
+        lower.endsWith(".bak") ||
+        lower.endsWith(".orig") ||
+        base.indexOf("._") === 0
+      ) {
+        action = "delete";
+        reason =
+          "File rác hệ thống / metadata chắc chắn";
+      }
+
+      /*
+       * --------------------------------------------------------
+       * DUPLICATE
+       * --------------------------------------------------------
+       *
+       * Không xóa duplicate.
+       *
+       * Hai texture/file giống byte nhau vẫn có thể được
+       * reference bằng hai path khác nhau.
+       *
+       * Hash chỉ được dùng để báo cáo, không dùng để delete.
+       */
+      if (
+        action === "keep" &&
+        size > 0 &&
+        (
+          /\.(png|jpg|jpeg|tga|ogg|fsb|wav)$/i.test(lower)
+        )
+      ) {
+        const key =
+          size +
+          "|" +
+          getExtension(fname);
+
+        let bucket = hashCache.get(key);
+
+        if (!bucket) {
+          bucket = [];
+          hashCache.set(key, bucket);
+        }
+
+        /*
+         * Chỉ hash tối đa một số candidate nhỏ để tránh
+         * ngốn CPU/RAM trên điện thoại.
+         */
+        if (bucket.length < 4) {
+          try {
+            const hash =
+              await simpleHash(data, opId);
+
+            bucket.push({
+              hash: hash,
+              name: fname
+            });
+
+            const duplicate =
+              bucket.some(function(item) {
+                return (
+                  item.hash === hash &&
+                  item.name !== fname
+                );
+              });
+
+            if (duplicate) {
+              reason =
+                "Trùng byte với file khác → KEEP để tránh phá reference";
+            }
+          } catch (e) {
+            checkAbort(opId);
+          }
+        }
+      }
+
+      /*
+       * --------------------------------------------------------
+       * JSON MINIFY
+       * --------------------------------------------------------
+       *
+       * Đây là thay đổi duy nhất ngoài junk deletion được
+       * tự động áp dụng.
+       *
+       * Nếu parse/stringify thất bại → KEEP.
+       *
+       * Không áp dụng cho mcstructure.
+       */
+      if (
+        action === "keep" &&
+        /\.json$/i.test(lower) &&
+        !isMcstructure(lower) &&
+        size > 200
+      ) {
+        try {
+          const str =
+            new TextDecoder().decode(data);
+
+          const parsed =
+            safeJsonParse(str);
+
+          /*
+           * JSON.stringify có thể thay đổi formatting nhưng
+           * không thay đổi semantic JSON.
+           */
+          const min =
+            JSON.stringify(parsed);
+
+          const nd =
+            new TextEncoder().encode(min);
+
+          if (nd.length < size) {
+            action = "optimize";
+            reason =
+              "Minify JSON (giữ nguyên dữ liệu JSON)";
+            newData = nd;
+          }
+        } catch (_) {
+          /*
+           * JSON không parse được → tuyệt đối KEEP.
+           */
+        }
+      }
+
+      /*
+       * --------------------------------------------------------
+       * TEXTURE
+       * --------------------------------------------------------
+       *
+       * Không tự re-encode PNG/JPG.
+       *
+       * Canvas có thể:
+       * - thay đổi metadata
+       * - thay đổi color handling
+       * - thay đổi alpha
+       * - thay đổi byte representation
+       * - làm texture lỗi trong một số engine
+       *
+       * Vì vậy bản public này ưu tiên KEEP.
+       */
+      if (
+        action === "keep" &&
+        /\.(png|jpg|jpeg)$/i.test(lower) &&
+        size > 100 * 1024
+      ) {
+        reason =
+          "Texture lớn → KEEP (không re-encode để tránh mất tương thích)";
+      }
+
+      decisions.push({
+        name: fname,
+        action: action,
+        reason: reason,
+        origSize: size,
+        newData: newData,
+        newSize:
+          newData !== null
+            ? newData.length
+            : null
+      });
+
+      /*
+       * data không được lưu vào decision.
+       * Chỉ newData của file thực sự optimize mới tồn tại.
+       */
+      data = null;
+
+      if (i % 12 === 0) {
+        setProgress(
+          progressBase +
+          progressSpan * 0.30 +
+          (i / totalFiles) *
+          (progressSpan * 0.70)
+        );
+
+        await yieldToUI();
+      }
+    }
+
+    let deletedCount = 0;
+    let optimizedCount = 0;
+    let estimatedSaved = 0;
+
+    for (let i = 0; i < decisions.length; i++) {
+      const d = decisions[i];
+
+      if (d.action === "delete") {
+        deletedCount++;
+        estimatedSaved += d.origSize;
+      } else if (
+        d.action === "optimize" &&
+        d.newSize !== null
+      ) {
+        optimizedCount++;
+
+        const saved =
+          d.origSize - d.newSize;
+
+        if (saved > 0) {
+          estimatedSaved += saved;
+        }
+      }
+    }
+
+    return {
+      decisions: decisions,
+      deletedCount: deletedCount,
+      optimizedCount: optimizedCount,
+      estimatedSaved: estimatedSaved,
+      referencedCount: referenced.size
+    };
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * MANIFEST
+   * ------------------------------------------------------------
+   *
+   * Cố ý KHÔNG sửa min_engine_version.
+   *
+   * Target version chỉ là lựa chọn của người dùng để tham khảo.
+   * Không có phép chuyển schema/API tự động nào đủ an toàn để
+   * giả vờ "convert" addon.
+   */
+  async function inspectManifests(
+    decisions,
+    zip,
+    opId
+  ) {
+    for (let i = 0; i < decisions.length; i++) {
+      checkAbort(opId);
+
+      const d = decisions[i];
+
+      if (
+        !isManifest(d.name) ||
+        d.action === "delete"
+      ) {
+        continue;
+      }
+
+      try {
+        const srcData =
+          d.newData ||
+          await zip
+            .file(d.name)
+            .async("uint8array");
+
+        const str =
+          new TextDecoder().decode(srcData);
+
+        const json =
+          safeJsonParse(str);
+
+        if (
+          json &&
+          json.header &&
+          json.header.min_engine_version
+        ) {
+          log(
+            "Manifest " +
+            d.name +
+            ": giữ nguyên min_engine_version (" +
+            JSON.stringify(
+              json.header.min_engine_version
+            ) +
+            ")",
+            "ok"
+          );
+        }
+      } catch (e) {
+        /*
+         * Không parse được → không sửa.
+         */
+        log(
+          "Không phân tích được manifest " +
+          d.name +
+          " → giữ nguyên",
+          "warn"
+        );
+      }
+    }
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * FIND NESTED MCPACKS
+   * ------------------------------------------------------------
+   */
+
+  function findNestedMcpacks(zip) {
+    return Object.keys(zip.files).filter(function(name) {
+      return (
+        !zip.files[name].dir &&
+        isMcpack(name)
+      );
+    });
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * AI/LITE
+   * ------------------------------------------------------------
+   */
+
+  btnAI.addEventListener("click", async function() {
+    if (!originalFile || isProcessing) return;
+
+    const opId = beginOperation();
+
+    btnCancel.classList.remove("hidden");
+
+    btnAnalyze.disabled = true;
+    btnAI.disabled = true;
+
+    btnApply.classList.add("hidden");
+    btnDownload.classList.add("hidden");
+
+    btnApply.disabled = true;
+    btnDownload.disabled = true;
+
+    setStatus("Đang tối ưu...");
+    log("=== BẮT ĐẦU TẠO BẢN LITE ===");
+
+    setProgress(2);
+
+    try {
+      if (!originalZip) {
+        originalZip =
+          await loadZipSafely(
+            originalFile,
+            opId
+          );
+      }
+
+      checkAbort(opId);
+
+      const outerZip = originalZip;
+
+      const outerNames =
+        validateZipEntries(outerZip)
+          .filter(function(n) {
+            return !outerZip.files[n].dir;
+          });
+
+      if (!outerNames.length) {
+        throw new Error(
+          "Archive không chứa file."
+        );
+      }
+
+      /*
+       * QUAN TRỌNG:
+       * Không còn chỉ tìm .mcpack ở root.
+       *
+       * Ví dụ:
+       *
+       * addon/
+       *   packs/
+       *     behavior.mcpack
+       *   resources/
+       *     resource.mcpack
+       *
+       * đều được phát hiện.
+       */
+      const nestedMcpacks =
+        findNestedMcpacks(outerZip);
+
+      const allDecisions = [];
+
+      let totalDeleted = 0;
+      let totalOptimized = 0;
+      let totalEstSaved = 0;
+
+      const packResults = [];
+
+      if (nestedMcpacks.length > 0) {
+        log(
+          "Xử lý .mcaddon/.zip có " +
+          nestedMcpacks.length +
+          " .mcpack bên trong",
+          "ok"
+        );
+
+        /*
+         * Các file ngoài .mcpack được giữ nguyên.
+         *
+         * Không đọc binary vào RAM ở đây.
+         * Apply sẽ đọc lại trực tiếp từ originalZip.
+         */
+        for (let oi = 0; oi < outerNames.length; oi++) {
+          checkAbort(opId);
+
+          const on = outerNames[oi];
+
+          if (
+            nestedMcpacks.indexOf(on) !== -1
+          ) {
+            continue;
+          }
+
+          const outerEntry =
+            outerZip.files[on];
+
+          allDecisions.push({
+            name: on,
+            action: "keep",
+            reason:
+              "File ngoài pack → giữ nguyên",
+            origSize:
+              typeof outerEntry._data === "object"
+                ? 0
+                : 0,
+            newData: null,
+            newSize: null,
+            outerPath: on,
+            isOuterNonPack: true
+          });
+
+          /*
+           * Không async đọc file ở đây.
+           * Điều này giảm RAM rất đáng kể trên mobile.
+           */
+        }
+
+        for (
+          let pi = 0;
+          pi < nestedMcpacks.length;
+          pi++
+        ) {
+          checkAbort(opId);
+
+          const packName =
+            nestedMcpacks[pi];
+
+          setStatus(
+            "Tối ưu pack: " +
+            packName
+          );
+
+          log(
+            "Đang mở " +
+            packName +
+            "..."
+          );
+
+          /*
+           * Chỉ load một .mcpack tại một thời điểm.
+           */
+          const packBuf =
+            await outerZip
+              .file(packName)
+              .async("arraybuffer");
+
+          checkAbort(opId);
+
+          let innerZip;
+
+          try {
+            innerZip =
+              await loadZipSafely(
+                packBuf,
+                opId
+              );
+          } catch (e) {
+            throw new Error(
+              "Không đọc được " +
+              packName +
+              ": " +
+              e.message
+            );
+          }
+
+          /*
+           * Release local reference sau khi JSZip đã load.
+           */
+          const base =
+            10 +
+            (pi / nestedMcpacks.length) *
+            75;
+
+          const span =
+            75 / nestedMcpacks.length;
+
+          const res =
+            await optimizePackContents(
+              innerZip,
+              base,
+              span,
+              opId
+            );
+
+          await inspectManifests(
+            res.decisions,
+            innerZip,
+            opId
+          );
+
+          totalDeleted +=
+            res.deletedCount;
+
+          totalOptimized +=
+            res.optimizedCount;
+
+          totalEstSaved +=
+            res.estimatedSaved;
+
+          res.decisions.forEach(function(d) {
+            allDecisions.push({
+              name:
+                packName +
+                " / " +
+                d.name,
+
+              action: d.action,
+              reason: d.reason,
+
+              origSize: d.origSize,
+              newData: d.newData,
+              newSize: d.newSize,
+
+              outerPath: packName,
+              innerName: d.name,
+              isNested: true
+            });
+          });
+
+          packResults.push({
+            outerPath: packName,
+            decisions: res.decisions,
+            innerZip: innerZip
+          });
+
+          /*
+           * packBuf không được lưu vào state.
+           */
+        }
+      } else {
+        /*
+         * Single .mcpack / flat .zip
+         */
+        log(
+          "Xử lý như single pack / flat archive",
+          "ok"
+        );
+
+        const res2 =
+          await optimizePackContents(
+            outerZip,
+            10,
+            75,
+            opId
+          );
+
+        await inspectManifests(
+          res2.decisions,
+          outerZip,
+          opId
+        );
+
+        totalDeleted =
+          res2.deletedCount;
+
+        totalOptimized =
+          res2.optimizedCount;
+
+        totalEstSaved =
+          res2.estimatedSaved;
+
+        res2.decisions.forEach(function(d) {
+          allDecisions.push({
+            name: d.name,
+            action: d.action,
+            reason: d.reason,
+            origSize: d.origSize,
+            newData: d.newData,
+            newSize: d.newSize,
+            outerPath: d.name,
+            innerName: d.name,
+            isNested: false
+          });
+        });
+
+        packResults.push({
+          outerPath: null,
+          decisions: res2.decisions,
+          innerZip: outerZip
+        });
+      }
+
+      checkAbort(opId);
+
+      analysisResult = {
+        decisions: allDecisions,
+        packResults: packResults,
+        isNestedMcaddon:
+          nestedMcpacks.length > 0,
+        deletedCount: totalDeleted,
+        optimizedCount: totalOptimized,
+        estimatedSaved: totalEstSaved,
+        originalSize: originalSize,
+        targetVersion: selectedVersion
+      };
+
+      renderProposal(allDecisions);
+
+      proposalCard.classList.remove("hidden");
+
+      btnApply.classList.remove("hidden");
+      btnApply.disabled = false;
+
+      setProgress(95);
+
+      log(
+        "Đề xuất: Xóa " +
+        totalDeleted +
+        " • Tối ưu " +
+        totalOptimized +
+        " • Tiết kiệm nội dung khoảng " +
+        formatSize(totalEstSaved) +
+        " trước khi nén archive",
+        "ok"
+      );
+
+      log(
+        "min_engine_version: KHÔNG tự thay đổi",
+        "ok"
+      );
+
+      log(
+        "Duplicate asset: KHÔNG tự xóa để tránh phá reference",
+        "ok"
+      );
+
+      log(
+        "Texture: KHÔNG re-encode tự động",
+        "ok"
+      );
+
+      setStatus(
+        "Xem đề xuất → bấm Áp dụng nếu đồng ý"
+      );
+    } catch (err) {
+      if (err.message === "Aborted") {
+        if (isCurrentOperation(opId)) {
+          log("Đã hủy", "warn");
+          setStatus("Đã hủy");
+        }
+      } else {
+        if (isCurrentOperation(opId)) {
+          log(
+            "Lỗi tối ưu: " +
+            err.message,
+            "err"
+          );
+
+          console.error(err);
+
+          setStatus(
+            "Lỗi / Không tạo bản Lite"
+          );
+        }
+      }
+    } finally {
+      if (isCurrentOperation(opId)) {
+        finishOperation(opId);
+
+        btnAnalyze.disabled = false;
+        btnAI.disabled = !originalFile;
+
+        if (!wasAborted) {
+          setProgress(100);
+        }
+      }
+    }
+  });
+
+  function renderProposal(decisions) {
+    while (proposalList.firstChild) {
+      proposalList.removeChild(
+        proposalList.firstChild
+      );
+    }
+
+    const order = {
+      delete: 0,
+      optimize: 1,
+      keep: 2
+    };
+
+    const sorted =
+      decisions
+        .slice()
+        .sort(function(a, b) {
+          return (
+            (order[a.action] ?? 2) -
+            (order[b.action] ?? 2)
+          );
+        });
+
+    const interesting =
+      sorted.filter(function(d) {
+        return (
+          d.action !== "keep" ||
+          d.origSize > 50000
+        );
+      });
+
+    const toShow =
+      interesting.length > 0
+        ? interesting.slice(0, 120)
+        : sorted.slice(0, 80);
+
+    for (let i = 0; i < toShow.length; i++) {
+      const d = toShow[i];
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "file-item " + d.action;
+
+      const nameDiv =
+        document.createElement("div");
+
+      nameDiv.style.cssText =
+        "overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1";
+
+      nameDiv.title = d.name;
+      nameDiv.textContent = d.name;
+
+      const right =
+        document.createElement("div");
+
+      right.style.cssText =
+        "display:flex;gap:6px;align-items:center";
+
+      const sizeSpan =
+        document.createElement("span");
+
+      sizeSpan.style.cssText =
+        "color:var(--muted);font-size:0.75rem";
+
+      sizeSpan.textContent =
+        d.newSize != null
+          ? formatSize(d.origSize) +
+            " → " +
+            formatSize(d.newSize)
+          : formatSize(d.origSize);
+
+      const badge =
+        document.createElement("span");
+
+      badge.className =
+        "badge " + d.action;
+
+      badge.textContent =
+        d.action === "delete"
+          ? "XÓA"
+          : d.action === "optimize"
+            ? "TỐI ƯU"
+            : "GIỮ";
+
+      right.appendChild(sizeSpan);
+      right.appendChild(badge);
+
+      div.appendChild(nameDiv);
+      div.appendChild(right);
+
+      proposalList.appendChild(div);
+    }
+
+    if (decisions.length > toShow.length) {
+      const more =
+        document.createElement("div");
+
+      more.className =
+        "file-item";
+
+      const em =
+        document.createElement("em");
+
+      em.textContent =
+        "... và " +
+        (decisions.length - toShow.length) +
+        " file khác";
+
+      more.appendChild(em);
+      proposalList.appendChild(more);
+    }
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * APPLY
+   * ------------------------------------------------------------
+   */
+
+  btnApply.addEventListener("click", async function() {
+    if (!analysisResult || isProcessing) return;
+
+    const opId = beginOperation();
+
+    btnCancel.classList.remove("hidden");
+    btnApply.disabled = true;
+
+    setStatus(
+      "Đang tạo file Lite..."
+    );
+
+    log(
+      "Áp dụng thay đổi và đóng gói..."
+    );
+
+    try {
+      const newOuter = new JSZip();
+      const pr =
+        analysisResult.packResults;
+
+      if (
+        analysisResult.isNestedMcaddon
+      ) {
+        /*
+         * Rebuild từng .mcpack.
+         */
+        for (
+          let i = 0;
+          i < pr.length;
+          i++
+        ) {
+          checkAbort(opId);
+
+          const pack = pr[i];
+
+          const newInner =
+            new JSZip();
+
+          for (
+            let j = 0;
+            j < pack.decisions.length;
+            j++
+          ) {
+            checkAbort(opId);
+
+            const d =
+              pack.decisions[j];
+
+            if (d.action === "delete") {
+              continue;
+            }
+
+            let payload =
+              d.newData;
+
+            if (!payload) {
+              /*
+               * Đọc trực tiếp từ original inner ZIP
+               * chỉ khi thật sự cần.
+               */
+              payload =
+                await pack.innerZip
+                  .file(d.name)
+                  .async("uint8array");
+            }
+
+            checkAbort(opId);
+
+            /*
+             * binary=true để không decode dữ liệu.
+             */
+            newInner.file(
+              d.name,
+              payload,
+              {
+                binary: true,
+                createFolders: false
+              }
+            );
+
+            /*
+             * Release reference tới optimized buffer
+             * sau khi JSZip đã nhận nó.
+             */
+            if (d.newData === payload) {
+              d.newData = null;
+            }
+
+            if (j % 15 === 0) {
+              setProgress(
+                15 +
+                (
+                  (
+                    i +
+                    j /
+                    Math.max(
+                      1,
+                      pack.decisions.length
+                    )
+                  ) /
+                  Math.max(1, pr.length)
+                ) *
+                60
+              );
+
+              await yieldToUI();
+            }
+          }
+
+          checkAbort(opId);
+
+          /*
+           * uint8array thay vì Blob giúp kiểm soát memory
+           * tốt hơn trong quá trình tạo outer archive.
+           */
+          const innerBytes =
+            await newInner.generateAsync({
+              type: "uint8array",
+              compression: "DEFLATE",
+              compressionOptions: {
+                level: 6
+              }
+            });
+
+          checkAbort(opId);
+
+          newOuter.file(
+            pack.outerPath,
+            innerBytes,
+            {
+              binary: true,
+              createFolders: false
+            }
+          );
+
+          if (i % 2 === 0) {
+            await yieldToUI();
+          }
+        }
+
+        /*
+         * Các file ngoài .mcpack:
+         * copy trực tiếp từ original ZIP.
+         */
+        const outerKeep =
+          analysisResult.decisions
+            .filter(function(d) {
+              return d.isOuterNonPack;
+            });
+
+        for (
+          let k = 0;
+          k < outerKeep.length;
+          k++
+        ) {
+          checkAbort(opId);
+
+          const od =
+            outerKeep[k];
+
+          if (od.action === "delete") {
+            continue;
+          }
+
+          const odata =
+            await originalZip
+              .file(od.outerPath)
+              .async("uint8array");
+
+          checkAbort(opId);
+
+          newOuter.file(
+            od.outerPath,
+            odata,
+            {
+              binary: true,
+              createFolders: false
+            }
+          );
+
+          if (k % 15 === 0) {
+            await yieldToUI();
+          }
+        }
+      } else {
+        /*
+         * Flat / single pack.
+         */
+        const pack0 = pr[0];
+
+        for (
+          let m = 0;
+          m < pack0.decisions.length;
+          m++
+        ) {
+          checkAbort(opId);
+
+          const dd =
+            pack0.decisions[m];
+
+          if (dd.action === "delete") {
+            continue;
+          }
+
+          let pay =
+            dd.newData;
+
+          if (!pay) {
+            pay =
+              await pack0.innerZip
+                .file(dd.name)
+                .async("uint8array");
+          }
+
+          checkAbort(opId);
+
+          newOuter.file(
+            dd.name,
+            pay,
+            {
+              binary: true,
+              createFolders: false
+            }
+          );
+
+          if (
+            dd.newData === pay
+          ) {
+            dd.newData = null;
+          }
+
+          if (m % 15 === 0) {
+            setProgress(
+              20 +
+              (
+                m /
+                Math.max(
+                  1,
+                  pack0.decisions.length
+                )
+              ) *
+              50
+            );
+
+            await yieldToUI();
+          }
+        }
+      }
+
+      checkAbort(opId);
+
+      setStatus(
+        "Đang nén archive cuối..."
+      );
+
+      const blob =
+        await newOuter.generateAsync(
+          {
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: {
+              level: 6
+            }
+          },
+          function(meta) {
+            /*
+             * generateAsync callback không thể abort JSZip
+             * giữa chừng một cách đáng tin cậy.
+             *
+             * Nhưng không cho kết quả bị commit nếu operation
+             * đã bị cancel.
+             */
+            if (
+              isCurrentOperation(opId) &&
+              !wasAborted
+            ) {
+              setProgress(
+                70 +
+                meta.percent * 0.3
+              );
+            }
+          }
+        );
+
+      checkAbort(opId);
+
+      /*
+       * Blob này chỉ được commit khi operation vẫn còn active.
+       */
+      optimizedBlob = blob;
+
+      const match =
+        originalFile.name.match(
+          /\.(mcaddon|mcpack|zip)$/i
+        );
+
+      const ext =
+        match
+          ? match[0]
+          : ".zip";
+
+      const baseName =
+        originalFile.name.replace(
+          /\.(mcaddon|mcpack|zip)$/i,
+          ""
+        );
+
+      optimizedName =
+        baseName +
+        "_Lite" +
+        ext;
+
+      /*
+       * Đây là dung lượng archive thực tế.
+       */
+      const actualOriginalSize =
+        originalFile.size;
+
+      const actualNewSize =
+        blob.size;
+
+      const saved =
+        actualOriginalSize -
+        actualNewSize;
+
+      const pct =
+        actualOriginalSize > 0
+          ? (
+              saved /
+              actualOriginalSize *
+              100
+            ).toFixed(1)
+          : "0.0";
+
+      document.getElementById(
+        "sizeOrig"
+      ).textContent =
+        formatSize(actualOriginalSize);
+
+      document.getElementById(
+        "sizeNew"
+      ).textContent =
+        formatSize(actualNewSize);
+
+      document.getElementById(
+        "sizeSaved"
+      ).textContent =
+        formatSize(Math.max(0, saved)) +
+        " (−" +
+        Math.max(0, Number(pct)) +
+        "%)";
+
+      const total =
+        analysisResult.decisions.length;
+
+      const kept =
+        Math.max(
+          0,
+          total -
+          analysisResult.deletedCount -
+          analysisResult.optimizedCount
+        );
+
+      document.getElementById(
+        "sizeStats"
+      ).textContent =
+        kept +
+        " giữ / " +
+        analysisResult.optimizedCount +
+        " tối ưu / " +
+        analysisResult.deletedCount +
+        " xóa";
+
+      sizeCard.classList.remove("hidden");
+
+      btnDownload.classList.remove(
+        "hidden"
+      );
+
+      btnDownload.disabled = false;
+
+      log(
+        "Hoàn tất! " +
+        formatSize(actualOriginalSize) +
+        " → " +
+        formatSize(actualNewSize) +
+        " (" +
+        (
+          saved >= 0
+            ? "−" + formatSize(saved)
+            : "+" + formatSize(-saved)
+        ) +
+        " / " +
+        pct +
+        "%)",
+        "ok"
+      );
+
+      log(
+        "Tên xuất: " +
+        optimizedName,
+        "ok"
+      );
+
+      setStatus(
+        "Sẵn sàng tải xuống"
+      );
+
+      setProgress(100);
+    } catch (err) {
+      if (err.message === "Aborted") {
+        if (isCurrentOperation(opId)) {
+          log(
+            "Đã hủy đóng gói",
+            "warn"
+          );
+
+          setStatus("Đã hủy");
+        }
+
+        /*
+         * Nếu cancel xảy ra sau generateAsync nhưng trước commit,
+         * optimizedBlob không bị thay thế.
+         */
+      } else {
+        if (isCurrentOperation(opId)) {
+          log(
+            "Lỗi tạo file: " +
+            err.message,
+            "err"
+          );
+
+          setStatus(
+            "Lỗi đóng gói — không tạo file"
+          );
+
+          /*
+           * Không cho phép tải output lỗi.
+           */
+          optimizedBlob = null;
+          optimizedName = "";
+
+          btnDownload.disabled = true;
+          btnDownload.classList.add("hidden");
+        }
+      }
+    } finally {
+      if (isCurrentOperation(opId)) {
+        finishOperation(opId);
+
+        /*
+         * Apply chỉ được bật lại nếu analysisResult vẫn tồn tại.
+         */
+        btnApply.disabled =
+          !analysisResult;
+
+        btnAnalyze.disabled = false;
+        btnAI.disabled = !originalFile;
+      }
+    }
+  });
+
+  /*
+   * ------------------------------------------------------------
+   * DOWNLOAD
+   * ------------------------------------------------------------
+   */
+
+  btnDownload.addEventListener(
+    "click",
+    function() {
+      if (
+        !optimizedBlob ||
+        !(optimizedBlob instanceof Blob) ||
+        optimizedBlob.size <= 0 ||
+        !optimizedName
+      ) {
+        log(
+          "Không có file output hợp lệ để tải.",
+          "err"
+        );
+
+        return;
+      }
+
+      const url =
+        URL.createObjectURL(
+          optimizedBlob
+        );
+
+      const a =
+        document.createElement("a");
+
+      a.href = url;
+      a.download = optimizedName;
+
+      /*
+       * append vào DOM giúp tương thích tốt hơn
+       * với một số browser Android.
+       */
+      document.body.appendChild(a);
+
+      try {
+        a.click();
+      } finally {
+        a.remove();
+
+        setTimeout(function() {
+          URL.revokeObjectURL(url);
+        }, 5000);
+      }
+
+      log(
+        "Đã tải: " +
+        optimizedName +
+        " (" +
+        formatSize(
+          optimizedBlob.size
+        ) +
+        ")",
+        "ok"
+      );
+    }
+  );
+
+})();
+</script>
+</body>
+</html>
