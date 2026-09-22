@@ -3,3541 +3,4505 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Minecraft Bedrock Addon Lite Optimizer v1.2</title>
+<title>Minecraft Bedrock Addon Lite Optimizer v2.0</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root {
-  --bg:#0f1419;
-  --card:#1a2332;
-  --border:#2d3a4f;
-  --text:#e6edf3;
-  --muted:#8b9cb3;
-  --accent:#3b82f6;
-  --accent-hover:#2563eb;
-  --success:#22c55e;
-  --warning:#f59e0b;
-  --danger:#ef4444;
-  --review:#f97316;
-  --radius:12px;
+  --bg: #0f1419;
+  --card: #1a2332;
+  --card2: #151d29;
+  --border: #2d3a4f;
+  --text: #e6edf3;
+  --muted: #8b9cb3;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --purple: #a78bfa;
+  --radius: 12px;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  line-height:1.5;
-  padding:12px;
-  max-width:900px;
-  margin:0 auto;
-  min-height:100vh
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  padding: 12px;
+  max-width: 980px;
+  margin: 0 auto;
+  min-height: 100vh;
 }
-h1{font-size:1.4rem;margin-bottom:4px}
-.subtitle{color:var(--muted);font-size:.85rem;margin-bottom:16px}
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:16px;
-  margin-bottom:12px
+h1 { font-size: 1.4rem; margin-bottom: 4px; }
+.subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 16px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
 }
-.drop-zone{
-  border:2px dashed var(--border);
-  border-radius:var(--radius);
-  padding:32px 16px;
-  text-align:center;
-  cursor:pointer;
-  transition:.2s;
-  background:rgba(59,130,246,.05)
+.card-title {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
 }
-.drop-zone.dragover{
-  border-color:var(--accent);
-  background:rgba(59,130,246,.15)
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 32px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(59,130,246,0.05);
 }
-.drop-zone p{color:var(--muted);font-size:.9rem}
-button,.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  padding:10px 16px;
-  border:0;
-  border-radius:8px;
-  font-size:.9rem;
-  font-weight:600;
-  cursor:pointer;
-  transition:.15s;
-  background:var(--accent);
-  color:white;
-  width:100%;
-  margin-top:8px
+.drop-zone.dragover {
+  border-color: var(--accent);
+  background: rgba(59,130,246,0.15);
 }
-button:hover:not(:disabled){background:var(--accent-hover)}
-button:disabled{opacity:.45;cursor:not-allowed}
-button.secondary{background:#334155}
-button.success{background:var(--success)}
-button.danger{background:var(--danger)}
-button.warning{background:var(--warning);color:#000}
-.version-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin:10px 0
+.drop-zone p {
+  color: var(--muted);
+  font-size: 0.9rem;
 }
-.version-btn{
-  padding:10px 8px;
-  background:#1e293b;
-  border:2px solid var(--border);
-  border-radius:8px;
-  color:var(--text);
-  font-size:.8rem;
-  text-align:center;
-  cursor:pointer
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--accent);
+  color: white;
+  width: 100%;
+  margin-top: 8px;
 }
-.version-btn.active{
-  border-color:var(--accent);
-  background:rgba(59,130,246,.2);
-  color:#93c5fd
+button:hover:not(:disabled) { background: var(--accent-hover); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.secondary { background: #334155; }
+button.success { background: var(--success); }
+button.danger { background: var(--danger); }
+button.warning { background: var(--warning); color: #000; }
+button.purple { background: #7c3aed; }
+button.ghost { background: #233044; }
+.version-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0;
 }
-.info-row{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  font-size:.85rem;
-  margin:4px 0
+.version-btn {
+  padding: 10px 8px;
+  background: #1e293b;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.8rem;
+  text-align: center;
+  cursor: pointer;
 }
-.info-row span:last-child{
-  color:var(--muted);
-  font-family:monospace;
-  text-align:right
+.version-btn.active {
+  border-color: var(--accent);
+  background: rgba(59,130,246,0.2);
+  color: #93c5fd;
 }
-.progress-bar{
-  height:8px;
-  background:#1e293b;
-  border-radius:4px;
-  overflow:hidden;
-  margin:10px 0
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 10px 0 12px;
 }
-.progress-fill{
-  height:100%;
-  background:linear-gradient(90deg,var(--accent),#60a5fa);
-  width:0%;
-  transition:width .2s
+.preset-btn {
+  padding: 11px 10px;
+  background: #1e293b;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
 }
-.log-box{
-  background:#0b1220;
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:10px;
-  max-height:240px;
-  overflow-y:auto;
-  font-family:ui-monospace,monospace;
-  font-size:.75rem;
-  white-space:pre-wrap;
-  color:#94a3b8
+.preset-btn strong { display: block; font-size: 0.85rem; }
+.preset-btn span { color: var(--muted); font-size: 0.74rem; }
+.preset-btn.active {
+  border-color: var(--accent);
+  background: rgba(59,130,246,0.15);
 }
-.log-box .ok{color:var(--success)}
-.log-box .warn{color:var(--warning)}
-.log-box .err{color:var(--danger)}
-.file-list{
-  max-height:320px;
-  overflow-y:auto;
-  font-size:.8rem
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 9px 0;
+  font-size: 0.83rem;
 }
-.file-item{
-  padding:7px 8px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-  gap:8px
+.check-row input {
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--accent);
 }
-.file-item.delete{background:rgba(239,68,68,.1)}
-.file-item.optimize{background:rgba(245,158,11,.1)}
-.file-item.review{background:rgba(249,115,22,.1)}
-.file-item.keep{background:rgba(34,197,94,.08)}
-.badge{
-  font-size:.65rem;
-  padding:2px 6px;
-  border-radius:4px;
-  white-space:nowrap
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.85rem;
+  margin: 4px 0;
 }
-.badge.delete{background:var(--danger)}
-.badge.optimize{background:var(--warning);color:#000}
-.badge.review{background:var(--review);color:#000}
-.badge.keep{background:var(--success)}
-.size-big{
-  font-size:1.1rem;
-  font-weight:700;
-  color:#93c5fd
+.info-row span:last-child {
+  color: var(--muted);
+  font-family: monospace;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
-.hidden{display:none!important}
-.note{
-  font-size:.8rem;
-  color:var(--muted);
-  margin-top:8px
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
 }
-.analysis-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:10px
+.stat {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px;
 }
-.analysis-box{
-  background:#111a28;
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:9px;
-  font-size:.78rem
+.stat .num {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #bfdbfe;
 }
-.analysis-box strong{
-  display:block;
-  margin-bottom:3px
+.stat .label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-top: 2px;
 }
-@media(min-width:600px){
-  .version-grid{grid-template-columns:repeat(4,1fr)}
-  button{width:auto;min-width:140px}
-  .btn-row{display:flex;flex-wrap:wrap;gap:8px}
+.progress-bar {
+  height: 8px;
+  background: #1e293b;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #60a5fa);
+  width: 0%;
+  transition: width 0.2s;
+}
+.log-box {
+  background: #0b1220;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+  color: #94a3b8;
+}
+.log-box .ok { color: var(--success); }
+.log-box .warn { color: var(--warning); }
+.log-box .err { color: var(--danger); }
+.file-list {
+  max-height: 420px;
+  overflow-y: auto;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+.file-item {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.file-item.delete { background: rgba(239,68,68,0.1); }
+.file-item.optimize { background: rgba(245,158,11,0.1); }
+.file-item.review { background: rgba(167,139,250,0.1); }
+.file-item.keep { background: rgba(34,197,94,0.05); }
+.file-check { flex: 0 0 auto; }
+.file-check input { width: 16px; height: 16px; accent-color: var(--accent); }
+.file-main { min-width: 0; flex: 1; }
+.file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-reason {
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+.file-right {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.badge {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.badge.delete { background: var(--danger); }
+.badge.optimize { background: var(--warning); color: #000; }
+.badge.review { background: var(--purple); color: #fff; }
+.badge.keep { background: var(--success); }
+.badge.unchanged { background: #475569; }
+.badge.added { background: var(--accent); }
+.size-big {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #93c5fd;
+}
+.hidden { display: none !important; }
+.note {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.toolbar button {
+  width: auto;
+  min-width: 110px;
+  margin-top: 0;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+  margin-top: 9px;
+}
+select {
+  background: #1e293b;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 9px;
+  font-size: 0.78rem;
+}
+.mini-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+.graph-list {
+  max-height: 320px;
+  overflow: auto;
+  margin-top: 8px;
+}
+.graph-edge {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.77rem;
+}
+.graph-edge .arrow { color: #93c5fd; padding: 0 4px; }
+.graph-edge .kind { color: var(--muted); font-size: 0.68rem; }
+.diff-add { background: rgba(59,130,246,0.10); }
+.diff-opt { background: rgba(245,158,11,0.10); }
+.diff-del { background: rgba(239,68,68,0.10); }
+.diff-keep { background: rgba(34,197,94,0.04); }
+.integrity-ok { color: var(--success); }
+.integrity-warn { color: var(--warning); }
+.integrity-bad { color: var(--danger); }
+summary {
+  cursor: pointer;
+  color: #cbd5e1;
+  font-size: 0.82rem;
+}
+.small {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+@media (min-width: 600px) {
+  .version-grid { grid-template-columns: repeat(4, 1fr); }
+  .preset-grid { grid-template-columns: repeat(3, 1fr); }
+  button { width: auto; min-width: 140px; }
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stats-grid { grid-template-columns: repeat(4, 1fr); }
 }
 </style>
 </head>
 
 <body>
+  <h1>⚡ Addon Lite Optimizer <span style="font-size:.72rem;color:#93c5fd">v2.0 BIG UPDATE</span></h1>
+  <p class="subtitle">
+    Phân tích → đề xuất → tối ưu → kiểm tra → so sánh → báo cáo • chạy 100% local
+  </p>
 
-<h1>⚡ Addon Lite Optimizer <small style="font-size:.65rem;color:#60a5fa">v1.2</small></h1>
+  <div class="card">
+    <div class="drop-zone" id="dropZone">
+      <p style="font-size:1.1rem;margin-bottom:6px">
+        📁 Kéo thả file .mcaddon / .mcpack / .zip
+      </p>
+      <p>hoặc bấm để chọn • Tối đa 200 MB</p>
+      <input
+        type="file"
+        id="fileInput"
+        accept=".mcaddon,.mcpack,.zip,application/zip"
+        hidden
+      >
+    </div>
 
-<p class="subtitle">
-  Tối ưu Minecraft Bedrock Addon → bản Lite nhẹ hơn • xử lý 100% local
-</p>
+    <div id="fileInfo" class="hidden" style="margin-top:12px">
+      <div class="info-row">
+        <span>Tên file</span>
+        <span id="fileName">—</span>
+      </div>
+      <div class="info-row">
+        <span>Dung lượng archive</span>
+        <span id="fileSize">—</span>
+      </div>
+      <div class="info-row">
+        <span>Loại</span>
+        <span id="fileType">—</span>
+      </div>
+    </div>
+  </div>
 
-<div class="card">
-  <div class="drop-zone" id="dropZone">
-    <p style="font-size:1.1rem;margin-bottom:6px">
-      📁 Kéo thả file .mcaddon / .mcpack / .zip
+  <div class="card">
+    <div class="card-title">
+      <span>🎮 Phiên bản Minecraft mục tiêu</span>
+      <span class="mini-chip" id="targetChip">1.26.30</span>
+    </div>
+
+    <div class="version-grid" id="versionGrid">
+      <div class="version-btn" data-v="1.26.3">1.26.3</div>
+      <div class="version-btn active" data-v="1.26.30">1.26.30</div>
+      <div class="version-btn" data-v="1.21.30">1.21.30</div>
+      <div class="version-btn" data-v="1.26.33">1.26.33</div>
+    </div>
+
+    <p class="note">
+      Phiên bản chỉ dùng để tham khảo tương thích. Không tự sửa
+      min_engine_version, schema hoặc API.
     </p>
-    <p>hoặc bấm để chọn • Tối đa 200 MB</p>
-    <input
-      type="file"
-      id="fileInput"
-      accept=".mcaddon,.mcpack,.zip,application/zip"
-      hidden
-    >
   </div>
 
-  <div id="fileInfo" class="hidden" style="margin-top:12px">
-    <div class="info-row">
-      <span>Tên file</span>
-      <span id="fileName">—</span>
+  <div class="card">
+    <div class="card-title">
+      <span>⚙️ Chế độ tối ưu</span>
+      <span class="mini-chip" id="presetChip">Balanced</span>
     </div>
-    <div class="info-row">
-      <span>Dung lượng</span>
-      <span id="fileSize">—</span>
+
+    <div class="preset-grid" id="presetGrid">
+      <div class="preset-btn" data-preset="safe">
+        <strong>🛡️ Safe</strong>
+        <span>Chỉ thay đổi có độ tin cậy cao.</span>
+      </div>
+      <div class="preset-btn active" data-preset="balanced">
+        <strong>⚖️ Balanced</strong>
+        <span>Cân bằng dung lượng và độ an toàn.</span>
+      </div>
+      <div class="preset-btn" data-preset="aggressive">
+        <strong>⚡ Aggressive</strong>
+        <span>Đưa ra thêm REVIEW để ông tự quyết.</span>
+      </div>
     </div>
-    <div class="info-row">
-      <span>Loại</span>
-      <span id="fileType">—</span>
+
+    <label class="check-row">
+      <input type="checkbox" id="allowJsReview">
+      <span>
+        <strong>Cho phép đề xuất JS bảo thủ</strong><br>
+        <span class="small">Chỉ bỏ comment trong JS và vẫn đánh dấu REVIEW; không dùng regex để xóa function/variable.</span>
+      </span>
+    </label>
+
+    <label class="check-row">
+      <input type="checkbox" id="allowUnusedReview">
+      <span>
+        <strong>Cho phép đề xuất asset có khả năng chưa dùng</strong><br>
+        <span class="small">Scanner cần reference rõ; thiếu reference không phải bằng chứng để tự động xóa.</span>
+      </span>
+    </label>
+  </div>
+
+  <div class="card">
+    <div class="btn-row">
+      <button id="btnAnalyze" disabled>🔍 Phân tích addon</button>
+      <button id="btnAI" class="warning" disabled>🤖 Phân tích & tạo bản Lite</button>
+      <button id="btnApply" class="success hidden" disabled>✅ Áp dụng mục đã chọn</button>
+      <button id="btnRollback" class="secondary hidden">↩️ Quay về Original</button>
+      <button id="btnDownload" class="success hidden" disabled>⬇️ Tải bản Lite</button>
+      <button id="btnCancel" class="danger secondary hidden">⏹ Hủy</button>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div id="statusText" style="font-size:0.85rem;color:var(--muted)">
+      Chưa có file
     </div>
   </div>
-</div>
 
-<div class="card">
-  <strong>Phiên bản Minecraft mục tiêu</strong>
+  <div class="card hidden" id="analysisCard">
+    <div class="card-title">
+      <span>🧠 Kết quả phân tích</span>
+      <span class="mini-chip" id="analysisModeChip">—</span>
+    </div>
 
-  <div class="version-grid" id="versionGrid">
-    <div class="version-btn" data-v="1.26.3">1.26.3</div>
-    <div class="version-btn active" data-v="1.26.30">1.26.30</div>
-    <div class="version-btn" data-v="1.21.30">1.21.30</div>
-    <div class="version-btn" data-v="1.26.33">1.26.33</div>
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="num" id="statFiles">0</div>
+        <div class="label">File</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="statText">0</div>
+        <div class="label">Text/code</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="statEdges">0</div>
+        <div class="label">Dependency edges</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="statUnused">0</div>
+        <div class="label">Unused candidates</div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <div class="info-row">
+        <span>JSON</span>
+        <span id="jsStats">—</span>
+      </div>
+      <div class="info-row">
+        <span>.mcfunction</span>
+        <span id="mcfunctionStats">—</span>
+      </div>
+      <div class="info-row">
+        <span>JS dynamic</span>
+        <span id="dynamicStats">—</span>
+      </div>
+      <div class="info-row">
+        <span>Safety</span>
+        <span id="safetyStats">—</span>
+      </div>
+    </div>
   </div>
 
-  <p class="note">
-    Phiên bản chỉ dùng để tham khảo tương thích.
-    Không downgrade và không tự convert schema/API.
+  <div class="card hidden" id="graphCard">
+    <div class="card-title">
+      <span>🕸️ Dependency Graph</span>
+      <span class="mini-chip" id="graphCountChip">0 edges</span>
+    </div>
+    <p class="note">
+      Đây là graph heuristic: import/require, function call và string reference rõ ràng được nối thành edge.
+      Dynamic reference chỉ được đánh dấu REVIEW.
+    </p>
+    <div class="graph-list" id="graphList"></div>
+  </div>
+
+  <div class="card hidden" id="proposalCard">
+    <div class="card-title">
+      <span>🎯 Đề xuất thay đổi</span>
+      <span class="mini-chip" id="proposalCountChip">0</span>
+    </div>
+
+    <p class="note">
+      ✅ mục đã chọn sẽ được áp dụng. Đỏ = xóa chắc chắn • Vàng = tối ưu • Tím = REVIEW • Xanh = giữ.
+    </p>
+
+    <div class="toolbar">
+      <button id="btnSelectSafe" class="ghost">☑ Chọn thay đổi an toàn</button>
+      <button id="btnSelectAll" class="ghost">☑ Chọn tất cả đề xuất</button>
+      <button id="btnClearAll" class="ghost">☐ Bỏ chọn</button>
+    </div>
+
+    <div class="filter-row">
+      <span class="small">Lọc:</span>
+      <select id="proposalFilter">
+        <option value="all">Tất cả</option>
+        <option value="delete">Xóa</option>
+        <option value="optimize">Tối ưu</option>
+        <option value="review">Review</option>
+        <option value="keep">Giữ</option>
+      </select>
+      <span class="mini-chip" id="selectedCountChip">0 đã chọn</span>
+    </div>
+
+    <div class="file-list" id="proposalList"></div>
+  </div>
+
+  <div class="card hidden" id="sizeCard">
+    <div class="card-title">
+      <span>📦 Dung lượng</span>
+      <span class="mini-chip">archive thực tế</span>
+    </div>
+    <div class="info-row">
+      <span>Dung lượng gốc</span>
+      <span id="sizeOrig" class="size-big">—</span>
+    </div>
+
+    <div class="info-row">
+      <span>Sau tối ưu</span>
+      <span id="sizeNew" class="size-big">—</span>
+    </div>
+
+    <div class="info-row">
+      <span>Đã giảm</span>
+      <span id="sizeSaved" class="size-big">—</span>
+    </div>
+
+    <div class="info-row">
+      <span>File giữ / tối ưu / xóa</span>
+      <span id="sizeStats">—</span>
+    </div>
+  </div>
+
+  <div class="card hidden" id="diffCard">
+    <div class="card-title">
+      <span>📊 Original ↔ Lite Diff</span>
+      <span class="mini-chip" id="diffCountChip">0 thay đổi</span>
+    </div>
+    <div class="file-list" id="diffList"></div>
+  </div>
+
+  <div class="card hidden" id="integrityCard">
+    <div class="card-title">
+      <span>🛡️ Integrity Check</span>
+      <span class="mini-chip" id="integrityChip">—</span>
+    </div>
+    <div id="integrityList"></div>
+  </div>
+
+  <div class="card hidden" id="reportCard">
+    <div class="card-title">
+      <span>📑 Optimization Report</span>
+      <span class="mini-chip">local</span>
+    </div>
+    <p class="note">Báo cáo không chứa nội dung binary của addon; chỉ ghi metadata, thay đổi và kết quả kiểm tra.</p>
+    <div class="toolbar">
+      <button id="btnReportJson" class="purple" disabled>⬇️ Report JSON</button>
+      <button id="btnReportTxt" class="secondary" disabled>⬇️ Report TXT</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span>🔧 Backup / Rollback</span>
+    </div>
+    <p class="note">
+      File Original trong phiên làm việc luôn được giữ nguyên. Website không sửa file gốc trên máy ông.
+      Rollback chỉ hủy output Lite đang giữ trong bộ nhớ và đưa workflow về Original.
+    </p>
+    <div class="toolbar">
+      <button id="btnResetOutput" class="secondary" disabled>↩️ Xóa output Lite</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span>📜 Log xử lý</span>
+      <span class="mini-chip" id="logCountChip">0</span>
+    </div>
+    <div class="log-box" id="logBox">Sẵn sàng...</div>
+  </div>
+
+  <details class="card">
+    <summary>ℹ️ Quy tắc an toàn của v2.0</summary>
+    <div style="margin-top:10px">
+      <p class="note">• Không tự sửa min_engine_version hoặc schema/API chỉ vì ông chọn phiên bản mục tiêu.</p>
+      <p class="note">• Không re-encode PNG/JPG/TGA/MCSTRUCTURE tự động.</p>
+      <p class="note">• Không xóa asset chỉ vì scanner không tìm thấy reference.</p>
+      <p class="note">• JS regex không được dùng để xóa function/variable; dynamic JS luôn giữ hoặc REVIEW.</p>
+      <p class="note">• `.mcstructure` được giữ nguyên nội dung.</p>
+      <p class="note">• Archive path traversal bị từ chối.</p>
+      <p class="note">• Output phải vượt Integrity Check trước khi nút tải được kích hoạt.</p>
+    </div>
+  </details>
+
+  <p class="note" style="margin-top:16px;text-align:center">
+    ⚠️ Bản Lite vẫn là heuristic. Luôn backup addon gốc và test kỹ trong game.<br>
+    Chế độ Aggressive chỉ mở rộng đề xuất REVIEW; không biến sự không chắc chắn thành bằng chứng an toàn.
   </p>
-</div>
-
-<div class="card">
-  <div class="btn-row">
-    <button id="btnAnalyze" disabled>
-      🔍 Phân tích addon
-    </button>
-
-    <button id="btnAI" class="warning" disabled>
-      ⚡ Phân tích & tạo bản Lite
-    </button>
-
-    <button id="btnApply" class="success hidden" disabled>
-      ✅ Áp dụng tối ưu hóa
-    </button>
-
-    <button id="btnDownload" class="success hidden" disabled>
-      ⬇️ Tải bản Lite
-    </button>
-
-    <button id="btnCancel" class="danger secondary hidden">
-      ⏹ Hủy
-    </button>
-  </div>
-
-  <div class="progress-bar">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
-
-  <div id="statusText" style="font-size:.85rem;color:var(--muted)">
-    Chưa có file
-  </div>
-</div>
-
-<div class="card hidden" id="analysisCard">
-  <strong>Phân tích code v1.2</strong>
-
-  <div class="analysis-grid">
-    <div class="analysis-box">
-      <strong>JavaScript</strong>
-      <span id="jsStats">—</span>
-    </div>
-
-    <div class="analysis-box">
-      <strong>MCFunction</strong>
-      <span id="mcfunctionStats">—</span>
-    </div>
-
-    <div class="analysis-box">
-      <strong>Reference</strong>
-      <span id="referenceStats">—</span>
-    </div>
-
-    <div class="analysis-box">
-      <strong>Độ an toàn</strong>
-      <span id="safetyStats">—</span>
-    </div>
-  </div>
-</div>
-
-<div class="card hidden" id="sizeCard">
-  <div class="info-row">
-    <span>Dung lượng gốc (archive)</span>
-    <span id="sizeOrig" class="size-big">—</span>
-  </div>
-
-  <div class="info-row">
-    <span>Sau tối ưu (archive)</span>
-    <span id="sizeNew" class="size-big">—</span>
-  </div>
-
-  <div class="info-row">
-    <span>Chênh lệch</span>
-    <span id="sizeSaved" class="size-big">—</span>
-  </div>
-
-  <div class="info-row">
-    <span>File giữ / tối ưu / review / xóa</span>
-    <span id="sizeStats">—</span>
-  </div>
-</div>
-
-<div class="card hidden" id="proposalCard">
-  <strong>Đề xuất thay đổi</strong>
-
-  <p class="note">
-    🔴 Xóa an toàn • 🟡 Tối ưu an toàn • 🟠 Cần kiểm tra
-    • 🟢 Giữ nguyên
-  </p>
-
-  <div class="file-list" id="proposalList"></div>
-</div>
-
-<div class="card">
-  <strong>Log xử lý</strong>
-  <div class="log-box" id="logBox">Sẵn sàng...</div>
-</div>
-
-<p class="note" style="margin-top:16px;text-align:center">
-  ⚠️ v1.2 dùng static analysis/heuristic local, không upload addon lên server.<br>
-  Nếu không đủ chắc chắn → KEEP. Luôn backup addon gốc và test trong game.<br>
-  Không xóa asset chỉ vì scanner không tìm thấy reference.
-</p>
 
 <script>
 (() => {
-"use strict";
-
-const MAX_SIZE = 200 * 1024 * 1024;
-const MAX_JSON_WORK_SIZE = 8 * 1024 * 1024;
-const MAX_CODE_WORK_SIZE = 4 * 1024 * 1024;
-
-let originalFile = null;
-let originalSize = 0;
-let selectedVersion = "1.26.30";
-let analysisResult = null;
-let optimizedBlob = null;
-let optimizedName = "";
-let isProcessing = false;
-let activeOperation = null;
-let operationSerial = 0;
-
-const dropZone = document.getElementById("dropZone");
-const fileInput = document.getElementById("fileInput");
-
-const fileInfo = document.getElementById("fileInfo");
-const fileNameEl = document.getElementById("fileName");
-const fileSizeEl = document.getElementById("fileSize");
-const fileTypeEl = document.getElementById("fileType");
-
-const btnAnalyze = document.getElementById("btnAnalyze");
-const btnAI = document.getElementById("btnAI");
-const btnApply = document.getElementById("btnApply");
-const btnDownload = document.getElementById("btnDownload");
-const btnCancel = document.getElementById("btnCancel");
-
-const progressFill = document.getElementById("progressFill");
-const statusText = document.getElementById("statusText");
-const logBox = document.getElementById("logBox");
-
-const analysisCard = document.getElementById("analysisCard");
-const proposalCard = document.getElementById("proposalCard");
-const proposalList = document.getElementById("proposalList");
-const sizeCard = document.getElementById("sizeCard");
-
-function log(message,type) {
-  const line=document.createElement("div");
-  if(type==="ok") line.className="ok";
-  if(type==="warn") line.className="warn";
-  if(type==="err") line.className="err";
-
-  line.textContent="["+
-    new Date().toLocaleTimeString()+
-    "] "+message;
-
-  logBox.appendChild(line);
-
-  while(logBox.childNodes.length>300){
-    logBox.removeChild(logBox.firstChild);
-  }
-
-  logBox.scrollTop=logBox.scrollHeight;
-}
-
-function formatSize(bytes){
-  if(!Number.isFinite(bytes)) return "—";
-
-  const sign=bytes<0?"-":"";
-  const n=Math.abs(bytes);
-
-  if(n<1024) return sign+Math.round(n)+" B";
-  if(n<1024*1024) return sign+(n/1024).toFixed(1)+" KB";
-  if(n<1024*1024*1024)
-    return sign+(n/1024/1024).toFixed(2)+" MB";
-
-  return sign+
-    (n/1024/1024/1024).toFixed(2)+" GB";
-}
-
-function setProgress(value,op){
-  if(
-    op &&
-    (
-      activeOperation!==op ||
-      op.controller.signal.aborted
-    )
-  ) return;
-
-  progressFill.style.width=
-    Math.min(100,Math.max(0,value))+"%";
-}
-
-function setStatus(text,op){
-  if(
-    op &&
-    (
-      activeOperation!==op ||
-      op.controller.signal.aborted
-    )
-  ) return;
-
-  statusText.textContent=text;
-}
-
-function yieldToUI(){
-  return new Promise(resolve=>setTimeout(resolve,0));
-}
-
-function beginOperation(){
-  if(isProcessing)
-    throw new Error("Đang có operation khác.");
-
-  const op={
-    id:++operationSerial,
-    controller:new AbortController()
-  };
-
-  activeOperation=op;
-  isProcessing=true;
-  setVersionButtonsDisabled(true);
-
-  return op;
-}
-
-function finishOperation(op){
-  if(activeOperation!==op) return;
-
-  activeOperation=null;
-  isProcessing=false;
-  btnCancel.classList.add("hidden");
-  setVersionButtonsDisabled(false);
-}
-
-function checkAbort(op){
-  if(
-    !op ||
-    activeOperation!==op ||
-    op.controller.signal.aborted
-  ){
-    throw new DOMException(
-      "Operation aborted",
-      "AbortError"
-    );
-  }
-}
-
-function isAbortError(error){
-  return !!(
-    error &&
-    (
-      error.name==="AbortError" ||
-      error.code===20
-    )
-  );
-}
-
-function setVersionButtonsDisabled(disabled){
-  document.querySelectorAll(".version-btn")
-    .forEach(btn=>{
-      btn.style.pointerEvents=disabled?"none":"";
-      btn.style.opacity=disabled?".55":"";
-    });
-}
-
-function getExtension(path){
-  const base=String(path).split("/").pop();
-  const i=base.lastIndexOf(".");
-  return i>=0
-    ? base.slice(i+1).toLowerCase()
-    : "";
-}
-
-function isMcpack(path){
-  return /\.mcpack$/i.test(path);
-}
-
-function isMcaddon(path){
-  return /\.mcaddon$/i.test(path);
-}
-
-function isManifest(path){
-  return /(?:^|\/)manifest\.json$/i.test(path);
-}
-
-function isMcstructure(path){
-  return /\.mcstructure$/i.test(path);
-}
-
-function isJavaScript(path){
-  return /\.(js|mjs|cjs)$/i.test(path);
-}
-
-function isMcfunction(path){
-  return /\.mcfunction$/i.test(path);
-}
-
-function isSafeJunk(path){
-  const normalized=String(path).replace(/\\/g,"/");
-  const parts=normalized.split("/").filter(Boolean);
-  const base=parts.length
-    ? parts[parts.length-1].toLowerCase()
-    : "";
-
-  if(base===".ds_store") return true;
-  if(base==="thumbs.db") return true;
-  if(base==="desktop.ini") return true;
-  if(base.startsWith("._")) return true;
-
-  if(
-    parts.some(
-      p=>p.toLowerCase()==="__macosx"
-    )
-  ) return true;
-
-  return false;
-}
-
-function validateArchivePath(path){
-  const normalized=String(path).replace(/\\/g,"/");
-
-  if(!normalized)
-    throw new Error("Archive chứa path rỗng.");
-
-  if(normalized.startsWith("/"))
-    throw new Error(
-      "Archive chứa absolute path: "+path
-    );
-
-  if(normalized.split("/").some(p=>p===".."))
-    throw new Error(
-      "Archive chứa path traversal: "+path
-    );
-}
-
-function getZipFiles(zip){
-  const names=[];
-
-  for(const name of Object.keys(zip.files)){
-    validateArchivePath(name);
-
-    if(!zip.files[name].dir)
-      names.push(name);
-  }
-
-  return names;
-}
-
-async function loadZip(input,op){
-  checkAbort(op);
-
-  let zip;
-
-  try{
-    zip=await JSZip.loadAsync(input,{
-      checkCRC32:false,
-      createFolders:false
-    });
-  }catch(error){
-    throw new Error(
-      "Không đọc được ZIP/archive. File có thể bị hỏng."
-    );
-  }
-
-  checkAbort(op);
-  getZipFiles(zip);
-
-  return zip;
-}
-
-function decodeUtf8(bytes){
-  return new TextDecoder(
-    "utf-8",
-    {fatal:true}
-  ).decode(bytes);
-}
-
-function stripJsonComments(text){
-  let result="";
-  let inString=false;
-  let escaped=false;
-
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-    const n=text[i+1];
-
-    if(inString){
-      result+=c;
-
-      if(escaped){
-        escaped=false;
-      }else if(c==="\\"){
-        escaped=true;
-      }else if(c==='"'){
-        inString=false;
-      }
-
-      continue;
-    }
-
-    if(c==='"'){
-      inString=true;
-      result+=c;
-      continue;
-    }
-
-    if(c==="/"&&n==="/"){
-      i+=2;
-
-      while(
-        i<text.length &&
-        text[i]!=="\n" &&
-        text[i]!=="\r"
-      ) i++;
-
-      if(i<text.length)
-        result+=text[i];
-
-      continue;
-    }
-
-    if(c==="/"&&n==="*"){
-      i+=2;
-
-      while(
-        i+1<text.length &&
-        !(
-          text[i]==="*" &&
-          text[i+1]==="/"
-        )
-      ) i++;
-
-      i++;
-      continue;
-    }
-
-    result+=c;
-  }
-
-  return result;
-}
-
-function parseJsonSafe(text){
-  return JSON.parse(
-    stripJsonComments(text)
-  );
-}
-
-function versionFromValue(value){
-  if(
-    Array.isArray(value) &&
-    value.length===3 &&
-    value.every(
-      x=>Number.isInteger(x)&&x>=0
-    )
-  ){
-    return value.slice();
-  }
-
-  if(
-    typeof value==="string" &&
-    /^\d+\.\d+\.\d+$/.test(value.trim())
-  ){
-    return value.trim().split(".").map(Number);
-  }
-
-  return null;
-}
-
-function compareVersions(a,b){
-  for(let i=0;i<3;i++){
-    if(a[i]<b[i]) return -1;
-    if(a[i]>b[i]) return 1;
-  }
-  return 0;
-}
-
-function versionText(v){
-  return v.join(".");
-}
-
-function sameVersion(a,b){
-  return compareVersions(a,b)===0;
-}
-
-function resetState(){
-  if(isProcessing) return;
-
-  originalFile=null;
-  originalSize=0;
-  analysisResult=null;
-  optimizedBlob=null;
-  optimizedName="";
-
-  fileInfo.classList.add("hidden");
-  proposalCard.classList.add("hidden");
-  analysisCard.classList.add("hidden");
-  sizeCard.classList.add("hidden");
-
-  btnAnalyze.disabled=true;
-  btnAI.disabled=true;
-
-  btnApply.disabled=true;
-  btnApply.classList.add("hidden");
-
-  btnDownload.disabled=true;
-  btnDownload.classList.add("hidden");
-
-  proposalList.textContent="";
-
-  setProgress(0);
-  setStatus("Chưa có file");
-}
-
-function handleFile(file){
-  if(isProcessing) return;
-
-  resetState();
-
-  if(!/\.(mcaddon|mcpack|zip)$/i.test(file.name)){
-    log(
-      "Chỉ hỗ trợ .mcaddon, .mcpack hoặc .zip.",
-      "err"
-    );
-    setStatus("File không hợp lệ");
-    return;
-  }
-
-  if(file.size>MAX_SIZE){
-    log(
-      "File vượt 200 MB: "+formatSize(file.size),
-      "err"
-    );
-    setStatus("File quá lớn");
-
-    alert("File vượt giới hạn 200 MB.");
-    return;
-  }
-
-  originalFile=file;
-  originalSize=file.size;
-
-  fileNameEl.textContent=file.name;
-  fileSizeEl.textContent=formatSize(file.size);
-
-  fileTypeEl.textContent=
-    (
-      file.name.split(".").pop()||""
-    ).toUpperCase();
-
-  fileInfo.classList.remove("hidden");
-
-  btnAnalyze.disabled=false;
-  btnAI.disabled=false;
-
-  log(
-    "Đã chọn "+file.name+
-    " ("+formatSize(file.size)+")",
-    "ok"
-  );
-
-  setStatus("Sẵn sàng phân tích");
-}
-
-dropZone.addEventListener("click",()=>{
-  if(isProcessing) return;
-  fileInput.value="";
-  fileInput.click();
-});
-
-dropZone.addEventListener("dragover",e=>{
-  e.preventDefault();
-
-  if(!isProcessing)
-    dropZone.classList.add("dragover");
-});
-
-dropZone.addEventListener("dragleave",()=>{
-  dropZone.classList.remove("dragover");
-});
-
-dropZone.addEventListener("drop",e=>{
-  e.preventDefault();
-  dropZone.classList.remove("dragover");
-
-  if(
-    !isProcessing &&
-    e.dataTransfer.files.length
-  ){
-    handleFile(e.dataTransfer.files[0]);
-  }
-});
-
-fileInput.addEventListener("change",()=>{
-  if(fileInput.files.length)
-    handleFile(fileInput.files[0]);
-});
-
-document.querySelectorAll(".version-btn")
-.forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    if(isProcessing) return;
-
-    const newVersion=btn.dataset.v;
-
-    if(
-      analysisResult &&
-      newVersion!==selectedVersion
-    ){
-      analysisResult=null;
-      optimizedBlob=null;
-      optimizedName="";
-
-      proposalCard.classList.add("hidden");
-      analysisCard.classList.add("hidden");
-      sizeCard.classList.add("hidden");
-
-      btnApply.classList.add("hidden");
-      btnDownload.classList.add("hidden");
-
-      btnApply.disabled=true;
-      btnDownload.disabled=true;
-
-      log(
-        "Đã đổi phiên bản mục tiêu → cần tạo lại bản Lite.",
-        "warn"
-      );
-    }
-
-    document.querySelectorAll(".version-btn")
-      .forEach(b=>b.classList.remove("active"));
-
-    btn.classList.add("active");
-    selectedVersion=newVersion;
-
-    log(
-      "Phiên bản mục tiêu: "+selectedVersion
-    );
-  });
-});
-
-btnCancel.addEventListener("click",()=>{
-  if(!isProcessing||!activeOperation) return;
-
-  activeOperation.controller.abort();
-
-  btnCancel.classList.add("hidden");
-
-  setStatus("Đang hủy...");
-  log(
-    "Đã yêu cầu hủy. Chờ operation hiện tại dừng...",
-    "warn"
-  );
-});
-
-
-/* =========================================================
-   GENERAL STATIC ANALYSIS
-   ========================================================= */
-
-function removeJsComments(text){
-  let out="";
-  let string=null;
-  let escaped=false;
-
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-    const n=text[i+1];
-
-    if(string){
-      out+=c;
-
-      if(escaped){
-        escaped=false;
-      }else if(c==="\\"){
-        escaped=true;
-      }else if(c===string){
-        string=null;
-      }
-
-      continue;
-    }
-
-    if(c==="\""||c==="'"||c==="`"){
-      string=c;
-      out+=c;
-      continue;
-    }
-
-    if(c==="/"&&n==="/"){
-      i+=2;
-
-      while(
-        i<text.length &&
-        text[i]!=="\n" &&
-        text[i]!=="\r"
-      ) i++;
-
-      out+="\n";
-      continue;
-    }
-
-    if(c==="/"&&n==="*"){
-      i+=2;
-
-      while(
-        i+1<text.length &&
-        !(
-          text[i]==="*" &&
-          text[i+1]==="/"
-        )
-      ) i++;
-
-      i++;
-      out+="\n";
-      continue;
-    }
-
-    out+=c;
-  }
-
-  return out;
-}
-
-function jsHasDynamicDanger(text){
-  return /\b(eval|Function)\s*\(/.test(text) ||
-    /\bimport\s*\(/.test(text) ||
-    /\bsetTimeout\s*\(\s*["'`]/.test(text) ||
-    /\bsetInterval\s*\(\s*["'`]/.test(text) ||
-    /\.constructor\s*\(/.test(text);
-}
-
-function jsHasDynamicAccess(text){
-  return /\[[^\]]+\]/.test(text) ||
-    /\bglobalThis\b/.test(text) ||
-    /\bwindow\b/.test(text) ||
-    /\bReflect\./.test(text) ||
-    /\bProxy\s*\(/.test(text);
-}
-
-function extractJsFunctions(text){
-  const result=[];
+  "use strict";
 
   /*
-   * Chỉ nhận dạng declaration/function expression cơ bản.
-   * Không cố parse toàn bộ JavaScript.
-   */
-  const patterns=[
-    /(?:^|[;\n}])\s*(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g,
-    /(?:^|[;\n}])\s*(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>/g,
-    /(?:^|[;\n}])\s*(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?[A-Za-z_$][\w$]*\s*=>/g
-  ];
-
-  for(const re of patterns){
-    let m;
-
-    while((m=re.exec(text))!==null){
-      if(!result.some(x=>x.name===m[1])){
-        result.push({
-          name:m[1],
-          index:m.index
-        });
-      }
-    }
-  }
-
-  return result;
-}
-
-function extractLocalVariables(text){
-  const result=[];
-
-  const re=
-    /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)/g;
-
-  let m;
-
-  while((m=re.exec(text))!==null){
-    const name=m[1];
-
-    if(!result.includes(name))
-      result.push(name);
-  }
-
-  return result;
-}
-
-function countOccurrences(text,needle){
-  if(!needle) return 0;
-
-  const re=new RegExp(
-    "\\b"+
-    needle.replace(
-      /[.*+?^${}()|[\]\\]/g,
-      "\\$&"
-    )+
-    "\\b",
-    "g"
-  );
-
-  return (text.match(re)||[]).length;
-}
-
-function analyzeJavaScriptText(text,name){
-  const result={
-    kind:"js",
-    name,
-    action:"keep",
-    confidence:"low",
-    reason:"",
-    transform:null,
-    findings:[]
-  };
-
-  if(!text.trim()){
-    result.reason="JavaScript rỗng → KEEP";
-    return result;
-  }
-
-  if(jsHasDynamicDanger(text)){
-    result.reason=
-      "Phát hiện dynamic code → không tự sửa";
-    result.confidence="low";
-    result.findings.push(
-      "dynamic-code"
-    );
-    return result;
-  }
-
-  const stripped=removeJsComments(text);
-  const dynamicAccess=jsHasDynamicAccess(stripped);
-
-  const functions=extractJsFunctions(stripped);
-
-  let unusedFunctions=[];
-
-  for(const fn of functions){
-    const count=countOccurrences(
-      stripped,
-      fn.name
-    );
-
-    /*
-     * 1 occurrence thường chính là declaration.
-     * Nếu nhiều hơn 1 → có reference.
-     */
-    if(
-      count<=1 &&
-      !new RegExp(
-        "\\b(?:export|default)\\s+[^\\n;]*\\b"+
-        fn.name+
-        "\\b"
-      ).test(stripped)
-    ){
-      unusedFunctions.push(fn.name);
-    }
-  }
-
-  if(unusedFunctions.length){
-    result.findings.push(
-      "Có function có vẻ không được reference: "+
-      unusedFunctions.slice(0,8).join(", ")
-    );
-
-    /*
-     * Không tự xóa function trong v1.2.
-     * Đây chỉ là REVIEW vì JS có thể được gọi
-     * từ Bedrock/event/dynamic import/file khác.
-     */
-    result.action="review";
-    result.confidence=dynamicAccess?"low":"medium";
-    result.reason=
-      "Phát hiện function có vẻ không được dùng → cần kiểm tra reference";
-  }
-
-  const variables=extractLocalVariables(stripped);
-
-  let unusedVariables=[];
-
-  for(const variable of variables){
-    const count=countOccurrences(
-      stripped,
-      variable
-    );
-
-    if(count<=1)
-      unusedVariables.push(variable);
-  }
-
-  if(unusedVariables.length){
-    result.findings.push(
-      "Biến có vẻ không được đọc: "+
-      unusedVariables.slice(0,8).join(", ")
-    );
-
-    if(result.action==="keep"){
-      result.action="review";
-      result.confidence="medium";
-      result.reason=
-        "Có biến có vẻ không được sử dụng → REVIEW";
-    }
-  }
-
-  /*
-   * Minify JS cực kỳ bảo thủ:
-   * chỉ bỏ comment + whitespace dư ở ngoài string.
+   * ============================================================
+   * MINECRAFT BEDROCK ADDON LITE OPTIMIZER v2.0
+   * ============================================================
    *
-   * Không đổi syntax/operator.
+   * v2.0 giữ cơ chế an toàn của v1.2 và thêm:
+   * - Dependency Graph
+   * - Unused Asset Scanner / REVIEW candidates
+   * - Safe / Balanced / Aggressive presets
+   * - Selective Optimization
+   * - Original ↔ Lite Diff
+   * - Backup / Rollback workflow
+   * - Integrity Check
+   * - Exportable JSON/TXT report
+   * - Better nested .mcpack handling
+   *
+   * Không có server/API. Tất cả xử lý nằm trong browser.
+   *
+   * LƯU Ý QUAN TRỌNG:
+   * - Không dùng regex để xóa dead JS code.
+   * - Không tự convert schema/API của Bedrock.
+   * - Không coi missing reference là bằng chứng asset có thể xóa.
+   * - JS comment stripping chỉ được đề xuất như REVIEW.
+   * ============================================================
    */
-  const minified=minifyJsSafe(stripped);
 
-  const oldBytes=
-    new TextEncoder().encode(text).length;
+  let originalFile = null;
+  let originalZip = null;
+  let originalSize = 0;
+  let selectedVersion = "1.26.30";
+  let selectedPreset = "balanced";
 
-  const newBytes=
-    new TextEncoder().encode(minified).length;
+  let analysisResult = null;
+  let optimizedBlob = null;
+  let optimizedName = "";
+  let reportData = null;
+  let lastIntegrity = null;
+  let lastDiff = [];
 
-  if(
-    newBytes<oldBytes &&
-    result.action==="keep"
-  ){
-    result.action="optimize";
-    result.confidence="medium";
-    result.reason=
-      "Rút gọn whitespace/comment JS an toàn ở mức lexical";
-    result.transform={
-      type:"js-minify-safe"
-    };
-    result.origSize=oldBytes;
-    result.newSize=newBytes;
-  }else{
-    result.origSize=oldBytes;
-    result.newSize=null;
-  }
+  let isProcessing = false;
+  let abortController = null;
+  let wasAborted = false;
 
-  return result;
-}
+  let operationSerial = 0;
+  let activeOperationId = 0;
 
-function minifyJsSafe(text){
-  let out="";
-  let string=null;
-  let escaped=false;
+  const MAX_SIZE = 200 * 1024 * 1024;
+  const MAX_TEXT_SCAN = 8 * 1024 * 1024;
+  const MAX_CODE_SCAN = 4 * 1024 * 1024;
+  const MAX_GRAPH_EDGES_UI = 250;
+  const MAX_PROPOSAL_UI = 300;
+  const MAX_DIFF_UI = 300;
 
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
+  const dropZone = document.getElementById("dropZone");
+  const fileInput = document.getElementById("fileInput");
+  const fileInfo = document.getElementById("fileInfo");
+  const fileNameEl = document.getElementById("fileName");
+  const fileSizeEl = document.getElementById("fileSize");
+  const fileTypeEl = document.getElementById("fileType");
 
-    if(string){
-      out+=c;
+  const btnAnalyze = document.getElementById("btnAnalyze");
+  const btnAI = document.getElementById("btnAI");
+  const btnApply = document.getElementById("btnApply");
+  const btnRollback = document.getElementById("btnRollback");
+  const btnDownload = document.getElementById("btnDownload");
+  const btnCancel = document.getElementById("btnCancel");
+  const btnReportJson = document.getElementById("btnReportJson");
+  const btnReportTxt = document.getElementById("btnReportTxt");
+  const btnResetOutput = document.getElementById("btnResetOutput");
 
-      if(escaped){
-        escaped=false;
-      }else if(c==="\\"){
-        escaped=true;
-      }else if(c===string){
-        string=null;
-      }
+  const btnSelectSafe = document.getElementById("btnSelectSafe");
+  const btnSelectAll = document.getElementById("btnSelectAll");
+  const btnClearAll = document.getElementById("btnClearAll");
 
-      continue;
+  const progressFill = document.getElementById("progressFill");
+  const statusText = document.getElementById("statusText");
+  const logBox = document.getElementById("logBox");
+  const logCountChip = document.getElementById("logCountChip");
+
+  const analysisCard = document.getElementById("analysisCard");
+  const graphCard = document.getElementById("graphCard");
+  const proposalCard = document.getElementById("proposalCard");
+  const sizeCard = document.getElementById("sizeCard");
+  const diffCard = document.getElementById("diffCard");
+  const integrityCard = document.getElementById("integrityCard");
+  const reportCard = document.getElementById("reportCard");
+  const proposalList = document.getElementById("proposalList");
+  const graphList = document.getElementById("graphList");
+  const diffList = document.getElementById("diffList");
+  const integrityList = document.getElementById("integrityList");
+  const proposalFilter = document.getElementById("proposalFilter");
+
+  const allowJsReview = document.getElementById("allowJsReview");
+  const allowUnusedReview = document.getElementById("allowUnusedReview");
+  const presetChip = document.getElementById("presetChip");
+  const targetChip = document.getElementById("targetChip");
+  const analysisModeChip = document.getElementById("analysisModeChip");
+  const proposalCountChip = document.getElementById("proposalCountChip");
+  const selectedCountChip = document.getElementById("selectedCountChip");
+  const graphCountChip = document.getElementById("graphCountChip");
+  const diffCountChip = document.getElementById("diffCountChip");
+  const integrityChip = document.getElementById("integrityChip");
+
+  let logCount = 0;
+
+  function log(msg, type) {
+    const time = new Date().toLocaleTimeString();
+    const line = document.createElement("div");
+
+    if (type === "ok") {
+      line.className = "ok";
+    } else if (type === "warn") {
+      line.className = "warn";
+    } else if (type === "err") {
+      line.className = "err";
     }
 
-    if(c==="\""||c==="'"||c==="`"){
-      string=c;
-      out+=c;
-      continue;
+    line.textContent = "[" + time + "] " + msg;
+    logBox.appendChild(line);
+    logCount++;
+    logCountChip.textContent = String(logCount);
+
+    while (logBox.childNodes.length > 350) {
+      logBox.removeChild(logBox.firstChild);
     }
 
-    if(/\s/.test(c)){
-      const prev=out[out.length-1]||"";
-      const next=text[i+1]||"";
-
-      /*
-       * Chỉ giữ whitespace khi hai token có thể dính
-       * thành một token khác.
-       */
-      if(
-        /[A-Za-z0-9_$]/.test(prev) &&
-        /[A-Za-z0-9_$]/.test(next)
-      ){
-        out+=" ";
-      }
-
-      continue;
-    }
-
-    out+=c;
+    logBox.scrollTop = logBox.scrollHeight;
   }
 
-  return out;
-}
+  function setProgress(p) {
+    if (wasAborted) return;
 
-
-/* =========================================================
-   MCFUNCTION ANALYSIS
-   ========================================================= */
-
-function stripMcfunctionComment(line){
-  const trimmed=line.trim();
-
-  if(!trimmed) return "";
-
-  if(trimmed.startsWith("#"))
-    return "";
-
-  /*
-   * Chỉ bỏ inline comment khi có khoảng trắng trước #.
-   * Tránh phá command/string có # hợp lệ.
-   */
-  const match=trimmed.match(/\s+#/);
-
-  if(match)
-    return trimmed.slice(0,match.index).trim();
-
-  return trimmed;
-}
-
-function analyzeMcfunctionText(text,name){
-  const result={
-    kind:"mcfunction",
-    name,
-    action:"keep",
-    confidence:"low",
-    reason:"",
-    transform:null,
-    findings:[],
-    origSize:0,
-    newSize:null
-  };
-
-  const lines=text.split(/\r?\n/);
-  const clean=[];
-  let duplicateCount=0;
-
-  let previous=null;
-
-  for(const raw of lines){
-    const line=stripMcfunctionComment(raw);
-
-    if(!line) continue;
-
-    clean.push(line);
-
-    if(
-      previous!==null &&
-      line===previous
-    ){
-      duplicateCount++;
-    }
-
-    previous=line;
+    progressFill.style.width =
+      Math.min(100, Math.max(0, p)) + "%";
   }
 
-  const originalBytes=
-    new TextEncoder().encode(text).length;
-
-  const output=
-    clean.join("\n")+
-    (
-      clean.length
-        ? "\n"
-        : ""
-    );
-
-  const outputBytes=
-    new TextEncoder().encode(output).length;
-
-  result.origSize=originalBytes;
-
-  if(duplicateCount>0){
-    result.action="review";
-    result.confidence="medium";
-    result.reason=
-      "Có command trùng liên tiếp → REVIEW";
-    result.findings.push(
-      "Command trùng liên tiếp: "+
-      duplicateCount
-    );
+  function setStatus(t) {
+    statusText.textContent = t;
   }
 
-  /*
-   * Chỉ tối ưu comment/blank lines.
-   * Không tự xóa command trùng vì command có thể
-   * có side effect hoặc phụ thuộc execution context.
-   */
-  if(
-    outputBytes<originalBytes &&
-    result.action==="keep"
-  ){
-    result.action="optimize";
-    result.confidence="high";
-    result.reason=
-      "Loại comment/blank line dư";
-    result.transform={
-      type:"mcfunction-minify-safe"
-    };
-    result.newSize=outputBytes;
+  function formatSize(b) {
+    if (!Number.isFinite(b) || b < 0) return "—";
+    if (b < 1024) return b + " B";
+    if (b < 1048576) return (b / 1024).toFixed(1) + " KB";
+    return (b / 1048576).toFixed(2) + " MB";
   }
 
-  return result;
-}
-
-
-/* =========================================================
-   JSON
-   ========================================================= */
-
-async function inspectJson(
-  zip,
-  name,
-  op,
-  targetVersion
-){
-  const entry=zip.file(name);
-
-  if(!entry){
-    return{
-      action:"keep",
-      reason:"Không tìm thấy entry → KEEP"
-    };
+  function yieldToUI() {
+    return new Promise(function(resolve) {
+      setTimeout(resolve, 0);
+    });
   }
 
-  let data;
-
-  try{
-    data=await entry.async("uint8array");
-  }catch(_){
-    return{
-      action:"keep",
-      reason:"Không đọc được JSON → KEEP"
-    };
+  function isCurrentOperation(id) {
+    return id === activeOperationId;
   }
 
-  checkAbort(op);
-
-  const originalSize=data.length;
-
-  if(originalSize>MAX_JSON_WORK_SIZE){
-    return{
-      action:"keep",
-      reason:"JSON quá lớn → bảo vệ RAM",
-      origSize:originalSize
-    };
-  }
-
-  let json;
-
-  try{
-    json=parseJsonSafe(
-      decodeUtf8(data)
-    );
-  }catch(_){
-    return{
-      action:"keep",
-      reason:"JSON/JSONC không parse chắc chắn → KEEP",
-      origSize:originalSize
-    };
-  }
-
-  if(isManifest(name)){
-    if(
-      !json||
-      !json.header||
-      !Object.prototype.hasOwnProperty.call(
-        json.header,
-        "min_engine_version"
-      )
-    ){
-      return{
-        action:"keep",
-        reason:
-          "Manifest không có min_engine_version → KEEP",
-        origSize:originalSize
-      };
-    }
-
-    const oldVersion=
-      versionFromValue(
-        json.header.min_engine_version
-      );
-
-    if(!oldVersion){
-      return{
-        action:"keep",
-        reason:
-          "min_engine_version không rõ format → KEEP",
-        origSize:originalSize
-      };
-    }
-
-    const cmp=
-      compareVersions(
-        oldVersion,
-        targetVersion
-      );
-
-    /*
-     * v1.2 an toàn hơn:
-     * KHÔNG tự nâng min_engine_version.
-     *
-     * Việc nâng field này có thể làm addon yêu cầu
-     * engine cao hơn dù code/schema chưa thực sự tương thích.
-     *
-     * Vì vậy chỉ REPORT, không APPLY.
-     */
-    if(cmp!==0){
-      return{
-        action:"review",
-        reason:
-          "Manifest khác target ("+
-          versionText(oldVersion)+
-          " vs "+
-          versionText(targetVersion)+
-          ") → chỉ REVIEW, không tự đổi",
-        origSize:originalSize
-      };
-    }
-
-    return{
-      action:"keep",
-      reason:"Manifest đã khớp target → KEEP",
-      origSize:originalSize
-    };
-  }
-
-  const minified=
-    JSON.stringify(json);
-
-  const outputData=
-    new TextEncoder().encode(minified);
-
-  if(outputData.length<originalSize){
-    return{
-      action:"optimize",
-      reason:"Minify JSON",
-      origSize:originalSize,
-      newSize:outputData.length,
-      transform:{
-        type:"json-minify"
-      }
-    };
-  }
-
-  return{
-    action:"keep",
-    reason:"Minify không giảm dung lượng → KEEP",
-    origSize:originalSize
-  };
-}
-
-
-/* =========================================================
-   CODE INSPECTION
-   ========================================================= */
-
-async function inspectCode(
-  zip,
-  name,
-  op
-){
-  const entry=zip.file(name);
-
-  if(!entry){
-    return{
-      action:"keep",
-      reason:"Không tìm thấy code → KEEP"
-    };
-  }
-
-  let data;
-
-  try{
-    data=await entry.async("uint8array");
-  }catch(_){
-    return{
-      action:"keep",
-      reason:"Không đọc được code → KEEP"
-    };
-  }
-
-  checkAbort(op);
-
-  if(data.length>MAX_CODE_WORK_SIZE){
-    return{
-      action:"keep",
-      reason:
-        "Code quá lớn → bỏ qua để bảo vệ RAM",
-      origSize:data.length
-    };
-  }
-
-  let text;
-
-  try{
-    text=decodeUtf8(data);
-  }catch(_){
-    return{
-      action:"keep",
-      reason:"UTF-8 không hợp lệ → KEEP",
-      origSize:data.length
-    };
-  }
-
-  if(isJavaScript(name)){
-    return analyzeJavaScriptText(
-      text,
-      name
-    );
-  }
-
-  if(isMcfunction(name)){
-    return analyzeMcfunctionText(
-      text,
-      name
-    );
-  }
-
-  return{
-    action:"keep",
-    reason:"Không phải code được hỗ trợ → KEEP",
-    origSize:data.length
-  };
-}
-
-
-/* =========================================================
-   OPTIMIZE PACK
-   ========================================================= */
-
-async function optimizePack(
-  zip,
-  op,
-  progressStart,
-  progressSpan,
-  targetVersion
-){
-  const names=getZipFiles(zip);
-  const decisions=[];
-
-  for(let i=0;i<names.length;i++){
-    checkAbort(op);
-
-    const name=names[i];
-    const entry=zip.file(name);
-
-    let origSize=0;
-
-    if(
-      entry&&
-      entry._data&&
-      Number.isFinite(
-        entry._data.uncompressedSize
-      )
-    ){
-      origSize=
-        entry._data.uncompressedSize;
-    }
-
-    let decision={
-      name,
-      action:"keep",
-      reason:"Giữ nguyên",
-      origSize,
-      newSize:null,
-      transform:null,
-      confidence:"high"
-    };
-
-    if(isMcstructure(name)){
-      decision.reason=
-        "Bảo vệ .mcstructure → không đụng vào";
-    }
-
-    else if(isSafeJunk(name)){
-      decision.action="delete";
-      decision.reason=
-        "Metadata hệ thống chắc chắn không cần cho addon";
-      decision.confidence="high";
-    }
-
-    else if(/\.json$/i.test(name)){
-      decision=Object.assign(
-        decision,
-        await inspectJson(
-          zip,
-          name,
-          op,
-          targetVersion
-        )
-      );
-    }
-
-    else if(
-      isJavaScript(name)||
-      isMcfunction(name)
-    ){
-      decision=Object.assign(
-        decision,
-        await inspectCode(
-          zip,
-          name,
-          op
-        )
-      );
-    }
-
-    else if(
-      /\.(png|jpg|jpeg|tga)$/i.test(name)
-    ){
-      decision.reason=
-        "Texture → KEEP, không re-encode";
-    }
-
-    decisions.push(decision);
-
-    setProgress(
-      progressStart+
-      (
-        (i+1)/
-        Math.max(1,names.length)
-      )*progressSpan,
-      op
-    );
-
-    if(i%10===0)
-      await yieldToUI();
-  }
-
-  return decisions;
-}
-
-
-/* =========================================================
-   STATS
-   ========================================================= */
-
-function calculateStats(decisions){
-  let keep=0;
-  let optimize=0;
-  let review=0;
-  let del=0;
-  let estimatedSaved=0;
-
-  for(const d of decisions){
-    if(d.action==="delete"){
-      del++;
-
-      if(Number.isFinite(d.origSize))
-        estimatedSaved+=d.origSize;
-    }
-
-    else if(d.action==="optimize"){
-      optimize++;
-
-      if(
-        Number.isFinite(d.origSize)&&
-        Number.isFinite(d.newSize)
-      ){
-        estimatedSaved+=
-          d.origSize-d.newSize;
-      }
-    }
-
-    else if(d.action==="review"){
-      review++;
-    }
-
-    else{
-      keep++;
+  function checkAbort(id) {
+    if (
+      !isCurrentOperation(id) ||
+      !abortController ||
+      abortController.signal.aborted
+    ) {
+      wasAborted = true;
+      throw new Error("Aborted");
     }
   }
 
-  return{
-    keep,
-    optimize,
-    review,
-    delete:del,
-    estimatedSaved,
-    changed:optimize+del
-  };
-}
+  function beginOperation() {
+    operationSerial++;
+    activeOperationId = operationSerial;
 
+    if (abortController) {
+      try {
+        abortController.abort();
+      } catch (_) {}
+    }
 
-/* =========================================================
-   APPLY TRANSFORM
-   ========================================================= */
+    abortController = new AbortController();
+    wasAborted = false;
+    isProcessing = true;
 
-async function transformEntry(
-  entry,
-  decision,
-  op
-){
-  checkAbort(op);
-
-  let bytes;
-
-  try{
-    bytes=await entry.async("uint8array");
-  }catch(_){
-    return null;
+    return activeOperationId;
   }
 
-  checkAbort(op);
+  function finishOperation(id) {
+    if (!isCurrentOperation(id)) return;
 
-  /*
-   * JSON
-   */
-  if(
-    decision.transform &&
-    decision.transform.type==="json-minify"
-  ){
-    let json;
+    isProcessing = false;
 
-    try{
-      json=parseJsonSafe(
-        decodeUtf8(bytes)
-      );
-    }catch(_){
-      return null;
+    if (abortController) {
+      abortController = null;
     }
 
-    const output=
-      new TextEncoder().encode(
-        JSON.stringify(json)
-      );
-
-    if(output.length>=bytes.length)
-      return null;
-
-    try{
-      JSON.parse(
-        new TextDecoder().decode(output)
-      );
-    }catch(_){
-      return null;
-    }
-
-    return output;
+    btnCancel.classList.add("hidden");
   }
 
-  /*
-   * JS
-   */
-  if(
-    decision.transform &&
-    decision.transform.type==="js-minify-safe"
-  ){
-    let text;
-
-    try{
-      text=decodeUtf8(bytes);
-    }catch(_){
-      return null;
-    }
-
-    if(jsHasDynamicDanger(text))
-      return null;
-
-    const outputText=
-      minifyJsSafe(
-        removeJsComments(text)
-      );
-
-    const output=
-      new TextEncoder().encode(
-        outputText
-      );
-
-    if(output.length>=bytes.length)
-      return null;
-
-    /*
-     * Basic integrity check.
-     * Không phải parser JS đầy đủ, nên nếu không chắc
-     * vẫn fallback KEEP.
-     */
-    if(
-      !basicJsBalanceCheck(outputText)
-    ){
-      return null;
-    }
-
-    return output;
+  function normalizePath(p) {
+    return String(p || "")
+      .replace(/\\/g, "/")
+      .replace(/^\/+/, "")
+      .replace(/^\.\//, "")
+      .replace(/\/+/g, "/")
+      .replace(/\/$/, "")
+      .toLowerCase();
   }
 
-  /*
-   * MCFUNCTION
-   */
-  if(
-    decision.transform &&
-    decision.transform.type==="mcfunction-minify-safe"
-  ){
-    let text;
+  function stripLeadingRelative(p) {
+    let n = normalizePath(p);
 
-    try{
-      text=decodeUtf8(bytes);
-    }catch(_){
-      return null;
+    while (n.startsWith("../")) {
+      n = n.slice(3);
     }
 
-    const lines=text.split(/\r?\n/);
-    const clean=[];
-
-    for(const raw of lines){
-      const line=
-        stripMcfunctionComment(raw);
-
-      if(line)
-        clean.push(line);
-    }
-
-    const output=
-      new TextEncoder().encode(
-        clean.join("\n")+
-        (clean.length?"\n":"")
-      );
-
-    if(output.length>=bytes.length)
-      return null;
-
-    return output;
+    return n;
   }
 
-  return null;
-}
+  function isSafeArchivePath(name) {
+    const n = String(name || "").replace(/\\/g, "/");
 
-function basicJsBalanceCheck(text){
-  let round=0;
-  let square=0;
-  let curly=0;
+    if (!n) return false;
+    if (n.startsWith("/")) return false;
 
-  let string=null;
-  let escaped=false;
+    const parts = n.split("/");
 
-  for(let i=0;i<text.length;i++){
-    const c=text[i];
-
-    if(string){
-      if(escaped){
-        escaped=false;
-      }else if(c==="\\"){
-        escaped=true;
-      }else if(c===string){
-        string=null;
-      }
-
-      continue;
+    for (const part of parts) {
+      if (part === "..") return false;
     }
-
-    if(c==="\""||c==="'"||c==="`"){
-      string=c;
-      continue;
-    }
-
-    if(c==="(") round++;
-    else if(c===")") round--;
-    else if(c==="[") square++;
-    else if(c==="]") square--;
-    else if(c==="{") curly++;
-    else if(c==="}") curly--;
-
-    if(
-      round<0||
-      square<0||
-      curly<0
-    ){
-      return false;
-    }
-  }
-
-  return(
-    !string&&
-    round===0&&
-    square===0&&
-    curly===0
-  );
-}
-
-async function applyDecisions(
-  zip,
-  decisions,
-  op,
-  progressStart,
-  progressSpan
-){
-  let changed=false;
-
-  for(let i=0;i<decisions.length;i++){
-    checkAbort(op);
-
-    const d=decisions[i];
-
-    if(d.action==="delete"){
-      if(zip.file(d.name)){
-        zip.remove(d.name);
-        changed=true;
-      }
-    }
-
-    else if(d.action==="optimize"){
-      const entry=zip.file(d.name);
-
-      if(!entry){
-        d.action="keep";
-        d.reason=
-          "Entry không còn tồn tại → KEEP";
-        d.transform=null;
-        d.newSize=null;
-      }else{
-        const output=
-          await transformEntry(
-            entry,
-            d,
-            op
-          );
-
-        checkAbort(op);
-
-        if(output){
-          zip.file(
-            d.name,
-            output,
-            {
-              binary:true,
-              createFolders:false
-            }
-          );
-
-          changed=true;
-        }else{
-          d.action="keep";
-          d.reason=
-            "Không xác nhận được transform khi Apply → KEEP";
-          d.transform=null;
-          d.newSize=null;
-        }
-      }
-    }
-
-    /*
-     * REVIEW tuyệt đối không auto-apply.
-     */
-    else if(d.action==="review"){
-      continue;
-    }
-
-    setProgress(
-      progressStart+
-      (
-        (i+1)/
-        Math.max(1,decisions.length)
-      )*progressSpan,
-      op
-    );
-
-    if(i%10===0)
-      await yieldToUI();
-  }
-
-  return changed;
-}
-
-async function verifyZipOutput(blob,op){
-  checkAbort(op);
-
-  try{
-    const check=
-      await JSZip.loadAsync(
-        blob,
-        {
-          checkCRC32:false,
-          createFolders:false
-        }
-      );
-
-    checkAbort(op);
-
-    const files=getZipFiles(check);
-
-    if(!files.length)
-      throw new Error("Output ZIP rỗng.");
 
     return true;
-  }catch(error){
-    if(isAbortError(error))
-      throw error;
+  }
 
-    throw new Error(
-      "Output archive không hợp lệ."
+  function validateZipEntries(zip) {
+    const names = Object.keys(zip.files);
+
+    for (const name of names) {
+      if (!isSafeArchivePath(name)) {
+        throw new Error("Archive chứa path không an toàn: " + name);
+      }
+    }
+
+    return names;
+  }
+
+  function getExtension(name) {
+    const base = String(name || "").split("/").pop();
+    const idx = base.lastIndexOf(".");
+
+    return idx >= 0
+      ? base.slice(idx + 1).toLowerCase()
+      : "";
+  }
+
+  function getBaseName(name) {
+    return String(name || "")
+      .split("/")
+      .pop();
+  }
+
+  function getStem(name) {
+    const base = getBaseName(name);
+    const ext = getExtension(name);
+
+    return ext
+      ? base.slice(0, -(ext.length + 1))
+      : base;
+  }
+
+  function isMcpack(name) {
+    return /\.mcpack$/i.test(name);
+  }
+
+  function isManifest(name) {
+    return /(?:^|\/)manifest\.json$/i.test(name);
+  }
+
+  function isMcstructure(name) {
+    return /\.mcstructure$/i.test(name);
+  }
+
+  function isTextCandidate(name) {
+    const ext = getExtension(name);
+
+    return (
+      ext === "json" ||
+      ext === "jsonc" ||
+      ext === "js" ||
+      ext === "mjs" ||
+      ext === "cjs" ||
+      ext === "mcfunction" ||
+      ext === "lang" ||
+      ext === "txt" ||
+      ext === "mcmeta" ||
+      ext === "material"
     );
   }
-}
 
+  function isCodeCandidate(name) {
+    const ext = getExtension(name);
 
-/* =========================================================
-   GLOBAL REFERENCE SCAN
-   ========================================================= */
+    return (
+      ext === "js" ||
+      ext === "mjs" ||
+      ext === "cjs" ||
+      ext === "mcfunction"
+    );
+  }
 
-async function scanReferences(
-  zip,
-  codeNames,
-  op
-){
-  const references=new Map();
+  function isJsonCandidate(name) {
+    const ext = getExtension(name);
+    return ext === "json" || ext === "jsonc";
+  }
 
-  for(const name of codeNames)
-    references.set(name,0);
+  function isLikelyAsset(name) {
+    const n = normalizePath(name);
 
-  /*
-   * Chỉ scan text files có khả năng chứa reference.
-   * Không đọc binary.
-   */
-  const names=getZipFiles(zip);
+    if (
+      n.includes("/textures/") ||
+      n.startsWith("textures/") ||
+      n.includes("/models/") ||
+      n.startsWith("models/") ||
+      n.includes("/sounds/") ||
+      n.startsWith("sounds/") ||
+      n.includes("/animations/") ||
+      n.startsWith("animations/") ||
+      n.includes("/animation_controllers/") ||
+      n.startsWith("animation_controllers/") ||
+      n.includes("/particles/") ||
+      n.startsWith("particles/") ||
+      n.includes("/models/entity/") ||
+      n.startsWith("models/entity/") ||
+      n.includes("/render_controllers/") ||
+      n.startsWith("render_controllers/") ||
+      n.includes("/attachables/") ||
+      n.startsWith("attachables/") ||
+      n.includes("/entities/") ||
+      n.startsWith("entities/") ||
+      n.includes("/items/") ||
+      n.startsWith("items/") ||
+      n.includes("/blocks/") ||
+      n.startsWith("blocks/") ||
+      n.includes("/ui/") ||
+      n.startsWith("ui/")
+    ) {
+      return true;
+    }
 
-  const searchable=
-    names.filter(name=>
-      isJavaScript(name)||
-      isMcfunction(name)||
-      /\.json$/i.test(name)||
-      /\.(txt|lang|material|mcmeta)$/i.test(name)
+    return false;
+  }
+
+  function shouldScanText(name, size) {
+    if (!isTextCandidate(name)) return false;
+    if (isMcstructure(name)) return false;
+
+    if (isCodeCandidate(name)) {
+      return size <= MAX_CODE_SCAN;
+    }
+
+    return size <= MAX_TEXT_SCAN;
+  }
+
+  function actionLabel(action) {
+    if (action === "delete") return "XÓA";
+    if (action === "optimize") return "TỐI ƯU";
+    if (action === "review") return "REVIEW";
+    return "GIỮ";
+  }
+
+  function presetName(preset) {
+    if (preset === "safe") return "Safe";
+    if (preset === "aggressive") return "Aggressive";
+    return "Balanced";
+  }
+
+  function presetDescription(preset) {
+    if (preset === "safe") {
+      return "Junk chắc chắn + JSON minify";
+    }
+
+    if (preset === "aggressive") {
+      return "Mở rộng REVIEW, không mặc định tin REVIEW";
+    }
+
+    return "Junk + JSON + mcfunction comments";
+  }
+
+  function setPreset(preset) {
+    selectedPreset = preset;
+
+    document.querySelectorAll(".preset-btn").forEach(function(btn) {
+      btn.classList.toggle(
+        "active",
+        btn.dataset.preset === preset
+      );
+    });
+
+    const name = presetName(preset);
+    presetChip.textContent = name;
+
+    log(
+      "Chế độ tối ưu: " +
+      name +
+      " — " +
+      presetDescription(preset)
     );
 
-  let processed=0;
+    if (analysisResult) {
+      updateSelectionFromPreset();
+      renderProposal();
+    }
+  }
 
-  for(const name of searchable){
-    checkAbort(op);
+  function setTargetVersion(v) {
+    selectedVersion = v;
+    targetChip.textContent = v;
 
-    const entry=zip.file(name);
+    document.querySelectorAll(".version-btn").forEach(function(btn) {
+      btn.classList.toggle(
+        "active",
+        btn.dataset.v === v
+      );
+    });
 
-    if(!entry) continue;
+    log("Chọn phiên bản mục tiêu: " + v);
 
-    let bytes;
+    if (analysisResult) {
+      analysisResult.targetVersion = v;
+      rebuildReportSkeleton();
+    }
+  }
 
-    try{
-      if(
-        entry._data &&
-        Number.isFinite(
-          entry._data.uncompressedSize
-        ) &&
-        entry._data.uncompressedSize>
-        MAX_CODE_WORK_SIZE
-      ){
+  function resetViewExceptFile() {
+    analysisCard.classList.add("hidden");
+    graphCard.classList.add("hidden");
+    proposalCard.classList.add("hidden");
+    sizeCard.classList.add("hidden");
+    diffCard.classList.add("hidden");
+    integrityCard.classList.add("hidden");
+    reportCard.classList.add("hidden");
+
+    btnApply.classList.add("hidden");
+    btnRollback.classList.add("hidden");
+    btnDownload.classList.add("hidden");
+
+    btnApply.disabled = true;
+    btnDownload.disabled = true;
+    btnReportJson.disabled = true;
+    btnReportTxt.disabled = true;
+    btnResetOutput.disabled = true;
+
+    while (proposalList.firstChild) {
+      proposalList.removeChild(proposalList.firstChild);
+    }
+
+    while (graphList.firstChild) {
+      graphList.removeChild(graphList.firstChild);
+    }
+
+    while (diffList.firstChild) {
+      diffList.removeChild(diffList.firstChild);
+    }
+
+    while (integrityList.firstChild) {
+      integrityList.removeChild(integrityList.firstChild);
+    }
+
+    setProgress(0);
+  }
+
+  function resetState() {
+    if (isProcessing) return;
+
+    originalZip = null;
+    analysisResult = null;
+    optimizedBlob = null;
+    optimizedName = "";
+    reportData = null;
+    lastIntegrity = null;
+    lastDiff = [];
+    wasAborted = false;
+
+    resetViewExceptFile();
+  }
+
+  function clearOutputOnly() {
+    optimizedBlob = null;
+    optimizedName = "";
+    lastIntegrity = null;
+    lastDiff = [];
+    reportData = analysisResult
+      ? buildReportData()
+      : null;
+
+    sizeCard.classList.add("hidden");
+    diffCard.classList.add("hidden");
+    integrityCard.classList.add("hidden");
+    reportCard.classList.toggle("hidden", !reportData);
+
+    btnDownload.classList.add("hidden");
+    btnDownload.disabled = true;
+    btnRollback.classList.add("hidden");
+    btnReportJson.disabled = true;
+    btnReportTxt.disabled = true;
+    btnResetOutput.disabled = !originalFile;
+
+    if (analysisResult) {
+      btnApply.classList.remove("hidden");
+      btnApply.disabled = false;
+      setStatus("Đã xóa output Lite. Original vẫn giữ nguyên.");
+      log("Rollback: đã bỏ output Lite và quay về workflow Original.", "ok");
+    }
+  }
+
+  function handleFile(file) {
+    if (isProcessing) return;
+
+    resetState();
+
+    if (!/\.(mcaddon|mcpack|zip)$/i.test(file.name)) {
+      log("Chỉ hỗ trợ .mcaddon, .mcpack, .zip", "err");
+      setStatus("File không hợp lệ");
+      return;
+    }
+
+    if (file.size > MAX_SIZE) {
+      log(
+        "File quá lớn: " +
+        formatSize(file.size) +
+        " > 200 MB",
+        "err"
+      );
+
+      setStatus("Vượt giới hạn 200 MB");
+      alert("File vượt quá 200 MB.");
+      return;
+    }
+
+    originalFile = file;
+    originalSize = file.size;
+
+    fileNameEl.textContent = file.name;
+    fileSizeEl.textContent = formatSize(file.size);
+    fileTypeEl.textContent =
+      file.name.split(".").pop().toUpperCase();
+
+    fileInfo.classList.remove("hidden");
+
+    btnAnalyze.disabled = false;
+    btnAI.disabled = false;
+    btnResetOutput.disabled = false;
+
+    log(
+      "Đã chọn: " +
+      file.name +
+      " (" +
+      formatSize(file.size) +
+      ")",
+      "ok"
+    );
+
+    setStatus("Sẵn sàng phân tích");
+  }
+
+  dropZone.addEventListener("click", function() {
+    fileInput.click();
+  });
+
+  dropZone.addEventListener("dragover", function(e) {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+  });
+
+  dropZone.addEventListener("dragleave", function() {
+    dropZone.classList.remove("dragover");
+  });
+
+  dropZone.addEventListener("drop", function(e) {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+
+    if (e.dataTransfer.files.length) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  fileInput.addEventListener("change", function() {
+    if (fileInput.files.length) {
+      handleFile(fileInput.files[0]);
+    }
+  });
+
+  document.querySelectorAll(".version-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      setTargetVersion(btn.dataset.v);
+    });
+  });
+
+  document.querySelectorAll(".preset-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      setPreset(btn.dataset.preset);
+    });
+  });
+
+  allowJsReview.addEventListener("change", function() {
+    if (analysisResult) {
+      analyzeCurrentSelectionRules();
+    }
+
+    log(
+      "JS REVIEW: " +
+      (allowJsReview.checked ? "BẬT" : "TẮT")
+    );
+  });
+
+  allowUnusedReview.addEventListener("change", function() {
+    if (analysisResult) {
+      analyzeCurrentSelectionRules();
+    }
+
+    log(
+      "Unused Asset REVIEW: " +
+      (allowUnusedReview.checked ? "BẬT" : "TẮT")
+    );
+  });
+
+  btnCancel.addEventListener("click", function() {
+    if (!isProcessing || !abortController) return;
+
+    wasAborted = true;
+
+    try {
+      abortController.abort();
+    } catch (_) {}
+
+    activeOperationId = ++operationSerial;
+    isProcessing = false;
+
+    btnCancel.classList.add("hidden");
+
+    setStatus("Đã hủy");
+    log("Người dùng hủy quá trình", "warn");
+  });
+
+  btnRollback.addEventListener("click", function() {
+    if (isProcessing || !originalFile) return;
+    clearOutputOnly();
+  });
+
+  btnResetOutput.addEventListener("click", function() {
+    if (isProcessing || !originalFile) return;
+    clearOutputOnly();
+  });
+
+  btnSelectSafe.addEventListener("click", function() {
+    if (!analysisResult) return;
+
+    analysisResult.decisions.forEach(function(d) {
+      d.selected = (
+        d.action === "delete" ||
+        (
+          d.action === "optimize" &&
+          (
+            d.safety === "safe" ||
+            d.category === "json" ||
+            d.category === "mcfunction"
+          )
+        )
+      );
+    });
+
+    renderProposal();
+    log("Đã chọn các thay đổi được đánh dấu an toàn.", "ok");
+  });
+
+  btnSelectAll.addEventListener("click", function() {
+    if (!analysisResult) return;
+
+    analysisResult.decisions.forEach(function(d) {
+      d.selected = d.action !== "keep";
+    });
+
+    renderProposal();
+    log("Đã chọn toàn bộ đề xuất có thể áp dụng.", "warn");
+  });
+
+  btnClearAll.addEventListener("click", function() {
+    if (!analysisResult) return;
+
+    analysisResult.decisions.forEach(function(d) {
+      d.selected = false;
+    });
+
+    renderProposal();
+    log("Đã bỏ chọn toàn bộ đề xuất.");
+  });
+
+  proposalFilter.addEventListener("change", function() {
+    renderProposal();
+  });
+
+  /*
+   * ------------------------------------------------------------
+   * JSON / TEXT HELPERS
+   * ------------------------------------------------------------
+   */
+
+  function stripJsonComments(str) {
+    let result = "";
+    let i = 0;
+    const len = str.length;
+
+    let inString = false;
+    let stringChar = "";
+    let escaped = false;
+
+    while (i < len) {
+      const ch = str[i];
+      const next = i + 1 < len ? str[i + 1] : "";
+
+      if (inString) {
+        result += ch;
+
+        if (escaped) {
+          escaped = false;
+        } else if (ch === "\\") {
+          escaped = true;
+        } else if (ch === stringChar) {
+          inString = false;
+        }
+
+        i++;
         continue;
       }
 
-      bytes=
-        await entry.async("uint8array");
-    }catch(_){
-      continue;
+      if (ch === '"' || ch === "'") {
+        inString = true;
+        stringChar = ch;
+        result += ch;
+        i++;
+        continue;
+      }
+
+      if (ch === "/" && next === "/") {
+        i += 2;
+
+        while (
+          i < len &&
+          str[i] !== "\n" &&
+          str[i] !== "\r"
+        ) {
+          i++;
+        }
+
+        continue;
+      }
+
+      if (ch === "/" && next === "*") {
+        i += 2;
+
+        while (
+          i < len - 1 &&
+          !(str[i] === "*" && str[i + 1] === "/")
+        ) {
+          i++;
+        }
+
+        if (i < len - 1) i += 2;
+        continue;
+      }
+
+      result += ch;
+      i++;
     }
 
-    let text;
+    return result;
+  }
 
-    try{
-      text=decodeUtf8(bytes);
-    }catch(_){
-      continue;
-    }
+  function safeJsonParse(str) {
+    return JSON.parse(stripJsonComments(str));
+  }
 
-    for(const target of codeNames){
-      if(target===name) continue;
+  function minifyJsonSafe(str) {
+    const parsed = safeJsonParse(str);
+    return JSON.stringify(parsed);
+  }
 
-      const base=
-        target.split("/").pop();
+  function countLines(str) {
+    if (!str) return 0;
+    return str.split(/\r?\n/).length;
+  }
 
-      const noExt=
-        base.replace(
-          /\.(js|mjs|cjs|mcfunction)$/i,
-          ""
-        );
+  function basicStringQuoteBalance(str) {
+    let single = false;
+    let double = false;
+    let backtick = false;
+    let escaped = false;
 
-      if(
-        text.includes(base)||
-        text.includes(noExt)
-      ){
-        references.set(
-          target,
-          (references.get(target)||0)+1
-        );
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+
+      if (ch === "\\") {
+        escaped = true;
+        continue;
+      }
+
+      if (!double && !backtick && ch === "'") {
+        single = !single;
+        continue;
+      }
+
+      if (!single && !backtick && ch === '"') {
+        double = !double;
+        continue;
+      }
+
+      if (!single && !double && ch === "`") {
+        backtick = !backtick;
       }
     }
 
-    processed++;
-
-    if(processed%8===0)
-      await yieldToUI();
+    return !single && !double && !backtick;
   }
 
-  return references;
-}
+  function basicJsBalanceCheck(str) {
+    const stack = [];
+    let quote = null;
+    let escaped = false;
+    let lineComment = false;
+    let blockComment = false;
+    let template = false;
 
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      const next = i + 1 < str.length ? str[i + 1] : "";
 
-/* =========================================================
-   ANALYZE BUTTON
-   ========================================================= */
+      if (lineComment) {
+        if (ch === "\n" || ch === "\r") {
+          lineComment = false;
+        }
+        continue;
+      }
 
-btnAnalyze.addEventListener("click",async()=>{
-  if(!originalFile||isProcessing) return;
+      if (blockComment) {
+        if (ch === "*" && next === "/") {
+          blockComment = false;
+          i++;
+        }
+        continue;
+      }
 
-  const op=beginOperation();
+      if (quote) {
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
 
-  btnAnalyze.disabled=true;
-  btnAI.disabled=true;
-  btnCancel.classList.remove("hidden");
+        if (ch === "\\") {
+          escaped = true;
+          continue;
+        }
 
-  setProgress(0,op);
-  setStatus("Đang đọc archive...",op);
+        if (ch === quote) {
+          quote = null;
+        }
 
-  log("=== PHÂN TÍCH ARCHIVE ===");
+        continue;
+      }
 
-  try{
-    const zip=
-      await loadZip(
-        originalFile,
-        op
-      );
+      if (!template && ch === "/" && next === "/") {
+        lineComment = true;
+        i++;
+        continue;
+      }
 
-    const files=getZipFiles(zip);
+      if (!template && ch === "/" && next === "*") {
+        blockComment = true;
+        i++;
+        continue;
+      }
 
-    if(!files.length)
-      throw new Error(
-        "Archive không chứa file."
-      );
+      if (ch === "'" || ch === '"') {
+        quote = ch;
+        continue;
+      }
 
-    log(
-      "Tìm thấy "+files.length+" file.",
-      "ok"
-    );
+      if (ch === "`") {
+        template = !template;
+        continue;
+      }
 
-    const codeNames=
-      files.filter(
-        name=>
-          isJavaScript(name)||
-          isMcfunction(name)
-      );
+      if (template) {
+        continue;
+      }
 
-    let jsCount=0;
-    let mcCount=0;
+      if (ch === "{" || ch === "[" || ch === "(") {
+        stack.push(ch);
+        continue;
+      }
 
-    for(const name of codeNames){
-      if(isJavaScript(name)) jsCount++;
-      if(isMcfunction(name)) mcCount++;
+      if (ch === "}" || ch === "]" || ch === ")") {
+        const expected =
+          ch === "}" ? "{" :
+          ch === "]" ? "[" : "(";
+
+        if (stack.pop() !== expected) {
+          return false;
+        }
+      }
     }
 
-    log(
-      "Code: "+jsCount+" JS / "+mcCount+" MCFunction",
-      "ok"
+    return (
+      stack.length === 0 &&
+      !quote &&
+      !lineComment &&
+      !blockComment &&
+      !template &&
+      basicStringQuoteBalance(str)
     );
+  }
 
-    const references=
-      await scanReferences(
-        zip,
-        codeNames,
-        op
-      );
+  function stripJsCommentsConservative(str) {
+    let out = "";
+    let i = 0;
+    let state = "code";
+    let escaped = false;
+    let regexPossible = true;
 
-    let referenced=0;
-
-    for(const count of references.values()){
-      if(count>0) referenced++;
+    function append(ch) {
+      out += ch;
     }
 
-    document.getElementById("jsStats")
-      .textContent=
-        jsCount+" file JS";
+    while (i < str.length) {
+      const ch = str[i];
+      const next = i + 1 < str.length ? str[i + 1] : "";
 
-    document.getElementById("mcfunctionStats")
-      .textContent=
-        mcCount+" file MCFunction";
+      if (state === "single") {
+        append(ch);
 
-    document.getElementById("referenceStats")
-      .textContent=
-        referenced+" code file có reference";
+        if (escaped) {
+          escaped = false;
+        } else if (ch === "\\") {
+          escaped = true;
+        } else if (ch === "'") {
+          state = "code";
+        }
 
-    document.getElementById("safetyStats")
-      .textContent=
-        "Không chắc chắn → KEEP";
+        i++;
+        continue;
+      }
 
-    analysisCard.classList.remove("hidden");
+      if (state === "double") {
+        append(ch);
 
-    const manifests=
-      files.filter(isManifest);
+        if (escaped) {
+          escaped = false;
+        } else if (ch === "\\") {
+          escaped = true;
+        } else if (ch === '"') {
+          state = "code";
+        }
 
-    let hasBP=false;
-    let hasRP=false;
-    let hasScript=false;
+        i++;
+        continue;
+      }
 
-    for(
-      let i=0;
-      i<manifests.length;
-      i++
-    ){
-      checkAbort(op);
+      if (state === "template") {
+        append(ch);
 
-      try{
-        const data=
-          await zip
-            .file(manifests[i])
-            .async("uint8array");
+        if (escaped) {
+          escaped = false;
+        } else if (ch === "\\") {
+          escaped = true;
+        } else if (ch === "`") {
+          state = "code";
+        }
 
-        const json=
-          parseJsonSafe(
-            decodeUtf8(data)
+        i++;
+        continue;
+      }
+
+      if (state === "regex") {
+        append(ch);
+
+        if (escaped) {
+          escaped = false;
+        } else if (ch === "\\") {
+          escaped = true;
+        } else if (ch === "/") {
+          state = "code";
+          regexPossible = false;
+        }
+
+        i++;
+        continue;
+      }
+
+      if (ch === "'") {
+        append(ch);
+        state = "single";
+        regexPossible = false;
+        i++;
+        continue;
+      }
+
+      if (ch === '"') {
+        append(ch);
+        state = "double";
+        regexPossible = false;
+        i++;
+        continue;
+      }
+
+      if (ch === "`") {
+        append(ch);
+        state = "template";
+        regexPossible = false;
+        i++;
+        continue;
+      }
+
+      if (ch === "/" && next === "/") {
+        i += 2;
+
+        while (
+          i < str.length &&
+          str[i] !== "\n" &&
+          str[i] !== "\r"
+        ) {
+          i++;
+        }
+
+        continue;
+      }
+
+      if (ch === "/" && next === "*") {
+        i += 2;
+
+        while (
+          i < str.length - 1 &&
+          !(str[i] === "*" && str[i + 1] === "/")
+        ) {
+          i++;
+        }
+
+        if (i < str.length - 1) i += 2;
+        continue;
+      }
+
+      if (
+        ch === "/" &&
+        regexPossible &&
+        next !== "/" &&
+        next !== "*"
+      ) {
+        /*
+         * Regex literal detection here is intentionally conservative.
+         * If uncertain, do not enter regex mode.
+         */
+        const before = out.trim().slice(-1);
+
+        if (
+          before === "" ||
+          "=([{,:;!&|?".includes(before)
+        ) {
+          append(ch);
+          state = "regex";
+          i++;
+          continue;
+        }
+      }
+
+      append(ch);
+
+      if (!/\s/.test(ch)) {
+        regexPossible =
+          ")]}".indexOf(ch) === -1 &&
+          !/[\w$]/.test(ch);
+      }
+
+      i++;
+    }
+
+    return out;
+  }
+
+  function minifyMcfunctionSafe(str) {
+    const lines = String(str || "").split(/\r?\n/);
+    const out = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      if (!line) continue;
+      if (line.startsWith("#")) continue;
+
+      out.push(line);
+    }
+
+    return out.join("\n") + (out.length ? "\n" : "");
+  }
+
+  function detectDynamicJs(str) {
+    const reasons = [];
+
+    if (/\beval\s*\(/.test(str)) reasons.push("eval()");
+    if (/\bFunction\s*\(/.test(str)) reasons.push("Function()");
+    if (/\b(?:import|require)\s*\(\s*[^\"'`]/.test(str)) {
+      reasons.push("dynamic import/require");
+    }
+    if (/set(?:Timeout|Interval)\s*\(\s*[\"'`]/.test(str)) {
+      reasons.push("string timer");
+    }
+    if (/\.constructor\s*\(/.test(str)) {
+      reasons.push("constructor()");
+    }
+    if (/\b(?:globalThis|window|Reflect|Proxy)\b/.test(str)) {
+      reasons.push("dynamic global/reflection");
+    }
+
+    return reasons;
+  }
+
+  function findJsImports(str) {
+    const edges = [];
+    let m;
+
+    const importRe = /\bimport\s+(?:[^;]*?\s+from\s+)?["']([^"']+)["']/g;
+    while ((m = importRe.exec(str)) !== null) {
+      edges.push({
+        target: m[1],
+        kind: "js-import"
+      });
+    }
+
+    const requireRe = /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g;
+    while ((m = requireRe.exec(str)) !== null) {
+      edges.push({
+        target: m[1],
+        kind: "js-require"
+      });
+    }
+
+    const dynImportRe = /\bimport\s*\(\s*["']([^"']+)["']\s*\)/g;
+    while ((m = dynImportRe.exec(str)) !== null) {
+      edges.push({
+        target: m[1],
+        kind: "js-dynamic-import"
+      });
+    }
+
+    return edges;
+  }
+
+  function findMcfunctionReferences(str) {
+    const edges = [];
+    let m;
+
+    const re = /(?:^|\s)function\s+([a-zA-Z0-9_:\/\.\-]+)/g;
+
+    while ((m = re.exec(str)) !== null) {
+      edges.push({
+        target: m[1],
+        kind: "mcfunction-call"
+      });
+    }
+
+    return edges;
+  }
+
+  function buildRefIndex(text) {
+    const set = new Set();
+    const source = String(text || "");
+    let m;
+
+    const addRef = function(value) {
+      if (!value) return;
+
+      const raw = String(value)
+        .replace(/\\/g, "/")
+        .trim();
+
+      if (!raw) return;
+      if (/^https?:\/\//i.test(raw)) return;
+      if (/^[A-Z]:\\/i.test(raw)) return;
+
+      const c = normalizePath(raw);
+      if (!c) return;
+
+      set.add(c);
+      set.add(c.split("/").pop());
+
+      if (c.includes("/")) {
+        const tail2 = c.split("/").slice(-2).join("/");
+        set.add(tail2);
+      }
+
+      const noExt = c.replace(/\.(png|jpg|jpeg|tga|ogg|fsb|wav|json|mcfunction|js|mjs|cjs)$/i, "");
+      set.add(noExt);
+      set.add(noExt.split("/").pop());
+    };
+
+    const quotedRe = /["']([^"'\n\r]{2,260})["']/g;
+    while ((m = quotedRe.exec(source)) !== null) {
+      addRef(m[1]);
+    }
+
+    const domainRe = /(?:textures|models|sounds|animations|animation_controllers|entities|items|blocks|particles|ui|functions|loot_tables|recipes|spawn_rules|trading|dialogue|geometry|attachables|render_controllers)\/[a-zA-Z0-9_\-\.\/\\]+/gi;
+    while ((m = domainRe.exec(source)) !== null) {
+      addRef(m[0]);
+    }
+
+    return set;
+  }
+
+  function getReferenceAliases(path) {
+    const n = normalizePath(path);
+    const ext = getExtension(n);
+    const aliases = new Set();
+
+    aliases.add(n);
+    aliases.add(getBaseName(n));
+    aliases.add(getStem(n));
+
+    if (ext) {
+      aliases.add(n.slice(0, -(ext.length + 1)));
+    }
+
+    if (n.startsWith("textures/")) {
+      aliases.add(n.slice("textures/".length));
+      aliases.add(n.slice("textures/".length).replace(/\.[^.]+$/, ""));
+      aliases.add("textures/" + getStem(n));
+    }
+
+    if (n.startsWith("sounds/")) {
+      aliases.add(n.slice("sounds/".length));
+      aliases.add(n.slice("sounds/".length).replace(/\.[^.]+$/, ""));
+    }
+
+    return aliases;
+  }
+
+  function isExplicitlyReferenced(path, referenced) {
+    const aliases = getReferenceAliases(path);
+
+    for (const alias of aliases) {
+      if (referenced.has(normalizePath(alias))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function resolveRelativeReference(sourceName, target) {
+    const raw = String(target || "").replace(/\\/g, "/");
+
+    if (!raw) return null;
+    if (/^[a-z]+:\/\//i.test(raw)) return null;
+
+    if (raw.startsWith("/")) {
+      return normalizePath(raw.slice(1));
+    }
+
+    const sourceParts = normalizePath(sourceName).split("/");
+    sourceParts.pop();
+
+    const targetParts = raw.split("/");
+
+    for (const part of targetParts) {
+      if (part === "." || part === "") continue;
+
+      if (part === "..") {
+        sourceParts.pop();
+      } else {
+        sourceParts.push(part);
+      }
+    }
+
+    return normalizePath(sourceParts.join("/"));
+  }
+
+  function resolveGraphTarget(sourceName, rawTarget, filesSet) {
+    const target = String(rawTarget || "").trim();
+    if (!target) return null;
+
+    const normalized = normalizePath(target);
+
+    if (filesSet.has(normalized)) {
+      return normalized;
+    }
+
+    const relative = resolveRelativeReference(sourceName, target);
+
+    if (relative && filesSet.has(relative)) {
+      return relative;
+    }
+
+    const candidates = [];
+    const ext = getExtension(normalized);
+
+    if (!ext) {
+      candidates.push(normalized + ".js");
+      candidates.push(normalized + ".mjs");
+      candidates.push(normalized + ".cjs");
+      candidates.push(normalized + ".json");
+      candidates.push(normalized + ".mcfunction");
+    }
+
+    const stem = normalized.replace(/^\.?\/?/, "");
+    candidates.push(stem);
+
+    for (const c of candidates) {
+      if (filesSet.has(c)) return c;
+    }
+
+    const tail = getBaseName(normalized);
+
+    for (const f of filesSet) {
+      if (getBaseName(f) === tail) {
+        return f;
+      }
+    }
+
+    return null;
+  }
+
+  function classifySafety(category, reason, dynamic) {
+    if (dynamic) return "keep";
+
+    if (category === "junk") return "safe";
+    if (category === "json") return "safe";
+    if (category === "mcfunction") return "safe";
+    if (category === "js-review") return "review";
+    if (category === "unused-asset") return "review";
+    if (String(reason).includes("uncertain")) return "review";
+
+    return "keep";
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * HASH / ARCHIVE
+   * ------------------------------------------------------------
+   */
+
+  async function simpleHash(uint8, id) {
+    checkAbort(id);
+
+    const copy = uint8.buffer.slice(
+      uint8.byteOffset,
+      uint8.byteOffset + uint8.byteLength
+    );
+
+    const dig = await crypto.subtle.digest("SHA-1", copy);
+
+    checkAbort(id);
+
+    return Array.from(new Uint8Array(dig))
+      .map(function(b) {
+        return b.toString(16).padStart(2, "0");
+      })
+      .join("");
+  }
+
+  async function loadZipSafely(input, id) {
+    checkAbort(id);
+
+    let zip;
+
+    try {
+      zip = await JSZip.loadAsync(input, {
+        checkCRC32: false,
+        createFolders: false
+      });
+    } catch (e) {
+      throw new Error("Archive/ZIP không đọc được hoặc có thể đã hỏng.");
+    }
+
+    checkAbort(id);
+    validateZipEntries(zip);
+
+    return zip;
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * JUNK / DECISION LOGIC
+   * ------------------------------------------------------------
+   */
+
+  function isHighConfidenceJunk(name) {
+    const lower = normalizePath(name);
+    const base = getBaseName(lower);
+
+    return (
+      base === ".ds_store" ||
+      base === "thumbs.db" ||
+      base === "desktop.ini" ||
+      lower.startsWith("__macosx/") ||
+      lower.includes("/__macosx/") ||
+      lower.startsWith(".git/") ||
+      lower.includes("/.git/") ||
+      base.startsWith("._")
+    );
+  }
+
+  function looksLikeBackupArtifact(name) {
+    const lower = normalizePath(name);
+    const base = getBaseName(lower);
+
+    return (
+      base.endsWith(".bak") ||
+      base.endsWith(".orig") ||
+      base.endsWith(".old") ||
+      base.endsWith(".tmp")
+    );
+  }
+
+  function makeDecision(base) {
+    return Object.assign({
+      selected: false,
+      action: "keep",
+      safety: "keep",
+      category: "keep",
+      reason: "Giữ nguyên",
+      origSize: 0,
+      newSize: null,
+      saved: 0,
+      newText: null,
+      newData: null,
+      isContainer: false,
+      isNested: false,
+      isOuter: false,
+      sourceArchive: null,
+      innerName: null,
+      outerPath: null,
+      dynamic: false,
+      candidateUnused: false
+    }, base || {});
+  }
+
+  function defaultSelectedForDecision(decision) {
+    if (decision.action === "delete") {
+      return decision.safety === "safe";
+    }
+
+    if (decision.action !== "optimize") {
+      return false;
+    }
+
+    if (decision.category === "json") {
+      return true;
+    }
+
+    if (decision.category === "mcfunction") {
+      return selectedPreset !== "safe";
+    }
+
+    if (decision.category === "js-review") {
+      return false;
+    }
+
+    return decision.safety === "safe";
+  }
+
+  function updateSelectionFromPreset() {
+    if (!analysisResult) return;
+
+    analysisResult.decisions.forEach(function(d) {
+      d.selected = defaultSelectedForDecision(d);
+    });
+
+    /* REVIEW luôn bỏ chọn, kể cả Aggressive. */
+    analysisResult.decisions.forEach(function(d) {
+      if (d.action === "review") {
+        d.selected = false;
+      }
+    });
+  }
+
+  function analyzeCurrentSelectionRules() {
+    if (!analysisResult) return;
+
+    /*
+     * JS comment-only review chỉ tồn tại khi user bật.
+     * Unused asset review cũng tương tự.
+     * Việc thay đổi setting không tự chọn REVIEW.
+     */
+    analysisResult.decisions.forEach(function(d) {
+      if (d.category === "js-review") {
+        d.enabled = allowJsReview.checked;
+      }
+
+      if (d.category === "unused-asset") {
+        d.enabled = allowUnusedReview.checked;
+      }
+
+      if (
+        d.action === "review" &&
+        !d.enabled
+      ) {
+        d.selected = false;
+      }
+    });
+
+    renderProposal();
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * ANALYZE SINGLE ARCHIVE
+   * ------------------------------------------------------------
+   */
+
+  async function analyzeArchive(zip, options, id) {
+    checkAbort(id);
+
+    const names = validateZipEntries(zip)
+      .filter(function(n) {
+        return !zip.files[n].dir;
+      });
+
+    const nested = new Set(
+      options && options.skipNested
+        ? findNestedMcpacks(zip)
+        : []
+    );
+
+    const filesSet = new Set(
+      names.map(function(n) {
+        return normalizePath(n);
+      })
+    );
+
+    const textRecords = [];
+    const referenced = new Set();
+    const graphEdges = [];
+    const dynamicFiles = [];
+    const stats = {
+      json: 0,
+      mcfunction: 0,
+      js: 0,
+      text: 0,
+      binary: 0,
+      files: names.length,
+      totalUncompressed: 0,
+      safeCandidates: 0,
+      reviewCandidates: 0,
+      unusedCandidates: 0
+    };
+
+    for (let i = 0; i < names.length; i++) {
+      checkAbort(id);
+
+      const name = names[i];
+      const entry = zip.files[name];
+      const ext = getExtension(name);
+
+      if (isMcpack(name) && nested.has(name)) {
+        stats.binary++;
+        continue;
+      }
+
+      let data = null;
+      let size = 0;
+
+      try {
+        data = await entry.async("uint8array");
+        size = data.length;
+        stats.totalUncompressed += size;
+      } catch (e) {
+        log("Không đọc được để phân tích: " + name, "warn");
+        continue;
+      }
+
+      if (isTextCandidate(name)) {
+        if (shouldScanText(name, size)) {
+          try {
+            const text = new TextDecoder().decode(data);
+            textRecords.push({
+              name: name,
+              text: text,
+              size: size,
+              ext: ext
+            });
+
+            stats.text++;
+
+            if (ext === "json" || ext === "jsonc") {
+              stats.json++;
+            }
+
+            if (ext === "mcfunction") {
+              stats.mcfunction++;
+            }
+
+            if (ext === "js" || ext === "mjs" || ext === "cjs") {
+              stats.js++;
+            }
+          } catch (e) {
+            log("Decode text thất bại: " + name, "warn");
+          }
+        } else {
+          log(
+            "Bỏ qua text quá lớn khi scan: " +
+            name +
+            " (" +
+            formatSize(size) +
+            ")",
+            "warn"
+          );
+        }
+      } else {
+        stats.binary++;
+      }
+
+      data = null;
+
+      if (i % 10 === 0) {
+        setProgress(
+          options.progressBase +
+          (i / Math.max(1, names.length)) *
+          options.progressSpan *
+          0.24
+        );
+
+        await yieldToUI();
+      }
+    }
+
+    /*
+     * Pass 2: reference index + graph edges.
+     */
+    const textMap = new Map();
+
+    for (const rec of textRecords) {
+      checkAbort(id);
+
+      textMap.set(normalizePath(rec.name), rec);
+
+      const refs = buildRefIndex(rec.text);
+      refs.forEach(function(r) {
+        referenced.add(normalizePath(r));
+      });
+
+      const ext = rec.ext;
+
+      if (ext === "js" || ext === "mjs" || ext === "cjs") {
+        const dyn = detectDynamicJs(rec.text);
+
+        if (dyn.length) {
+          dynamicFiles.push({
+            name: rec.name,
+            reasons: dyn
+          });
+        }
+
+        const jsEdges = findJsImports(rec.text);
+
+        for (const edge of jsEdges) {
+          const target = resolveGraphTarget(
+            rec.name,
+            edge.target,
+            filesSet
           );
 
-        const modules=
-          Array.isArray(json.modules)
-            ?json.modules
-            :[];
-
-        for(const module of modules){
-          if(!module) continue;
-
-          if(module.type==="data")
-            hasBP=true;
-
-          if(module.type==="resources")
-            hasRP=true;
-
-          if(module.type==="script")
-            hasScript=true;
+          graphEdges.push({
+            from: rec.name,
+            to: target || edge.target,
+            kind: edge.kind,
+            resolved: Boolean(target)
+          });
         }
-      }catch(_){
+      }
+
+      if (ext === "mcfunction") {
+        const fnEdges = findMcfunctionReferences(rec.text);
+
+        for (const edge of fnEdges) {
+          const target = resolveGraphTarget(
+            rec.name,
+            edge.target,
+            filesSet
+          );
+
+          graphEdges.push({
+            from: rec.name,
+            to: target || edge.target,
+            kind: edge.kind,
+            resolved: Boolean(target)
+          });
+        }
+      }
+
+      if (textMap.size % 15 === 0) {
+        setProgress(
+          options.progressBase +
+          options.progressSpan *
+          0.24 +
+          (textMap.size / Math.max(1, textRecords.length)) *
+          options.progressSpan *
+          0.16
+        );
+        await yieldToUI();
+      }
+    }
+
+    /*
+     * Pass 3: decisions.
+     */
+    const decisions = [];
+    const unusedCandidates = [];
+
+    const hashes = new Map();
+
+    for (let i = 0; i < names.length; i++) {
+      checkAbort(id);
+
+      const name = names[i];
+      const entry = zip.files[name];
+      const norm = normalizePath(name);
+
+      if (
+        options.skipNested &&
+        nested.has(name)
+      ) {
+        const bytes = await entry.async("uint8array");
+
+        decisions.push(
+          makeDecision({
+            name: name,
+            action: "keep",
+            safety: "keep",
+            category: "nested-container",
+            reason: "Nested .mcpack container → xử lý ở graph nội bộ",
+            origSize: bytes.length,
+            isContainer: true,
+            isOuter: true,
+            outerPath: name,
+            sourceArchive: options.archiveLabel || "outer"
+          })
+        );
+
+        continue;
+      }
+
+      let data = null;
+      let size = 0;
+
+      try {
+        data = await entry.async("uint8array");
+        size = data.length;
+      } catch (_) {
+        decisions.push(
+          makeDecision({
+            name: name,
+            action: "keep",
+            safety: "keep",
+            category: "unreadable",
+            reason: "Không đọc được → KEEP",
+            origSize: 0,
+            sourceArchive: options.archiveLabel || "archive"
+          })
+        );
+        continue;
+      }
+
+      const lower = norm;
+      const base = getBaseName(lower);
+
+      let d = makeDecision({
+        name: name,
+        origSize: size,
+        sourceArchive: options.archiveLabel || "archive",
+        outerPath: options.outerPath || null,
+        isOuter: Boolean(options.isOuter)
+      });
+
+      /* High-confidence junk. */
+      if (isHighConfidenceJunk(name)) {
+        d.action = "delete";
+        d.safety = "safe";
+        d.category = "junk";
+        d.reason = "File rác hệ thống / metadata chắc chắn";
+        d.selected = true;
+        stats.safeCandidates++;
+      } else if (looksLikeBackupArtifact(name)) {
+        d.action = "review";
+        d.safety = "review";
+        d.category = "backup-artifact";
+        d.reason = "Tên file giống backup/temp → REVIEW, không tự xóa";
+        d.selected = false;
+        d.enabled = selectedPreset === "aggressive";
+        stats.reviewCandidates++;
+      }
+
+      /* JSON minify. */
+      if (
+        d.action === "keep" &&
+        isJsonCandidate(name) &&
+        !isMcstructure(name) &&
+        size > 120 &&
+        size <= MAX_TEXT_SCAN
+      ) {
+        try {
+          const str = new TextDecoder().decode(data);
+          const min = minifyJsonSafe(str);
+          const nd = new TextEncoder().encode(min);
+
+          if (nd.length < size) {
+            d.action = "optimize";
+            d.safety = "safe";
+            d.category = "json";
+            d.reason = "Minify JSON — semantic JSON vẫn parse được";
+            d.newSize = nd.length;
+            d.saved = size - nd.length;
+            d.newData = nd;
+            d.selected = defaultSelectedForDecision(d);
+            stats.safeCandidates++;
+          }
+        } catch (_) {
+          /* JSON parse fail → KEEP. */
+        }
+      }
+
+      /* mcfunction minify. */
+      if (
+        d.action === "keep" &&
+        getExtension(name) === "mcfunction" &&
+        size <= MAX_CODE_SCAN
+      ) {
+        try {
+          const str = new TextDecoder().decode(data);
+          const min = minifyMcfunctionSafe(str);
+          const nd = new TextEncoder().encode(min);
+
+          if (nd.length < size) {
+            const lineBefore = countLines(str);
+            const lineAfter = countLines(min);
+
+            d.action = "optimize";
+            d.safety = "safe";
+            d.category = "mcfunction";
+            d.reason =
+              "Xóa comment/blank line — " +
+              lineBefore +
+              " → " +
+              lineAfter +
+              " dòng";
+            d.newSize = nd.length;
+            d.saved = size - nd.length;
+            d.newData = nd;
+            d.selected = defaultSelectedForDecision(d);
+            stats.safeCandidates++;
+          }
+        } catch (_) {
+          /* Keep original. */
+        }
+      }
+
+      /* JS comment-only REVIEW. */
+      if (
+        d.action === "keep" &&
+        (getExtension(name) === "js" ||
+         getExtension(name) === "mjs" ||
+         getExtension(name) === "cjs") &&
+        size <= MAX_CODE_SCAN
+      ) {
+        try {
+          const str = new TextDecoder().decode(data);
+          const dyn = detectDynamicJs(str);
+          const stripped = stripJsCommentsConservative(str);
+          const nd = new TextEncoder().encode(stripped);
+
+          if (
+            nd.length < size &&
+            basicJsBalanceCheck(stripped) &&
+            basicJsBalanceCheck(str)
+          ) {
+            if (dyn.length) {
+              d.action = "keep";
+              d.safety = "keep";
+              d.reason =
+                "JS có dynamic behavior: " +
+                dyn.join(", ") +
+                " → KEEP";
+              d.dynamic = true;
+              dynamicFiles.push({
+                name: name,
+                reasons: dyn
+              });
+            } else if (allowJsReview.checked) {
+              d.action = "review";
+              d.safety = "review";
+              d.category = "js-review";
+              d.reason =
+                "Có thể bỏ comment JS; vẫn REVIEW vì parser đầy đủ chưa được dùng";
+              d.newSize = nd.length;
+              d.saved = size - nd.length;
+              d.newData = nd;
+              d.selected = false;
+              d.enabled = true;
+              stats.reviewCandidates++;
+            }
+          }
+        } catch (_) {
+          /* JS scan fail → KEEP. */
+        }
+      }
+
+      /* Unused asset REVIEW. */
+      if (
+        d.action === "keep" &&
+        isLikelyAsset(name) &&
+        !isExplicitlyReferenced(name, referenced)
+      ) {
+        /*
+         * Không chọn tự động.
+         * Một số Bedrock assets được truy cập theo convention,
+         * wildcard, folder/tag hoặc runtime.
+         */
+        d.action = "review";
+        d.safety = "review";
+        d.category = "unused-asset";
+        d.reason =
+          "Không tìm thấy reference rõ ràng → REVIEW, chưa đủ cơ sở để xóa";
+        d.candidateUnused = true;
+        d.enabled = allowUnusedReview.checked;
+        d.selected = false;
+        stats.unusedCandidates++;
+        unusedCandidates.push(name);
+      }
+
+      /* Manifest mismatch report only. */
+      if (
+        d.action === "keep" &&
+        isManifest(name)
+      ) {
+        try {
+          const str = new TextDecoder().decode(data);
+          const json = safeJsonParse(str);
+
+          if (
+            json &&
+            json.header &&
+            json.header.min_engine_version
+          ) {
+            d.reason =
+              "Manifest OK — giữ nguyên min_engine_version " +
+              JSON.stringify(json.header.min_engine_version);
+          }
+        } catch (_) {
+          d.reason = "Manifest không parse được → KEEP";
+        }
+      }
+
+      /* Byte hash for reporting only; bounded by size and bucket. */
+      if (
+        size > 0 &&
+        size <= 2 * 1024 * 1024 &&
+        /\.(png|jpg|jpeg|tga|ogg|fsb|wav)$/i.test(name)
+      ) {
+        const key = size + "|" + getExtension(name);
+        let bucket = hashes.get(key);
+
+        if (!bucket) {
+          bucket = [];
+          hashes.set(key, bucket);
+        }
+
+        if (bucket.length < 3) {
+          try {
+            const hash = await simpleHash(data, id);
+            bucket.push({ name: name, hash: hash });
+          } catch (_) {
+            checkAbort(id);
+          }
+        }
+      }
+
+      decisions.push(d);
+
+      data = null;
+
+      if (i % 10 === 0) {
+        setProgress(
+          options.progressBase +
+          options.progressSpan *
+          0.40 +
+          (i / Math.max(1, names.length)) *
+          options.progressSpan *
+          0.55
+        );
+        await yieldToUI();
+      }
+    }
+
+    const hashDuplicates = [];
+
+    for (const bucket of hashes.values()) {
+      const byHash = new Map();
+
+      bucket.forEach(function(item) {
+        const arr = byHash.get(item.hash) || [];
+        arr.push(item.name);
+        byHash.set(item.hash, arr);
+      });
+
+      for (const [hash, names2] of byHash.entries()) {
+        if (names2.length > 1) {
+          hashDuplicates.push({
+            hash: hash,
+            names: names2.slice()
+          });
+        }
+      }
+    }
+
+    return {
+      names: names,
+      decisions: decisions,
+      graphEdges: graphEdges,
+      referenced: Array.from(referenced),
+      unusedCandidates: unusedCandidates,
+      dynamicFiles: dynamicFiles,
+      hashDuplicates: hashDuplicates,
+      stats: stats,
+      nestedMcpacks: Array.from(nested),
+      textRecords: textRecords
+    };
+  }
+
+  function findNestedMcpacks(zip) {
+    return Object.keys(zip.files).filter(function(name) {
+      return !zip.files[name].dir && isMcpack(name);
+    });
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * BUILD ANALYSIS MODEL
+   * ------------------------------------------------------------
+   */
+
+  async function buildAnalysisModel(zip, id) {
+    checkAbort(id);
+
+    const allNames = validateZipEntries(zip)
+      .filter(function(n) {
+        return !zip.files[n].dir;
+      });
+
+    const nested = findNestedMcpacks(zip);
+    const isNestedContainer = nested.length > 0;
+
+    const outerResult = await analyzeArchive(
+      zip,
+      {
+        skipNested: isNestedContainer,
+        isOuter: isNestedContainer,
+        archiveLabel: "outer",
+        progressBase: 8,
+        progressSpan: 22
+      },
+      id
+    );
+
+    const decisions = [];
+    const graphEdges = [];
+    const unusedCandidates = [];
+    const dynamicFiles = [];
+    const packResults = [];
+    const stats = {
+      files: outerResult.stats.files,
+      text: outerResult.stats.text,
+      json: outerResult.stats.json,
+      mcfunction: outerResult.stats.mcfunction,
+      js: outerResult.stats.js,
+      edges: outerResult.graphEdges.length,
+      unusedCandidates: outerResult.unusedCandidates.length,
+      reviewCandidates: outerResult.stats.reviewCandidates,
+      safeCandidates: outerResult.stats.safeCandidates,
+      dynamicFiles: outerResult.dynamicFiles.length,
+      totalUncompressed: outerResult.stats.totalUncompressed,
+      nestedMcpacks: nested.length,
+      containers: nested.length
+    };
+
+    outerResult.decisions.forEach(function(d) {
+      decisions.push(
+        makeDecision(Object.assign({}, d, {
+          sourceArchive: "outer",
+          isOuter: true,
+          outerPath: d.name
+        }))
+      );
+    });
+
+    outerResult.graphEdges.forEach(function(e) {
+      graphEdges.push(Object.assign({}, e, { archive: "outer" }));
+    });
+
+    outerResult.unusedCandidates.forEach(function(n) {
+      unusedCandidates.push({
+        archive: "outer",
+        name: n
+      });
+    });
+
+    dynamicFiles.push.apply(
+      dynamicFiles,
+      outerResult.dynamicFiles.map(function(x) {
+        return Object.assign({}, x, { archive: "outer" });
+      })
+    );
+
+    packResults.push({
+      outerPath: null,
+      isOuter: true,
+      decisions: outerResult.decisions,
+      originalZip: zip,
+      analysis: outerResult,
+      hasSelectedChanges: false
+    });
+
+    for (let i = 0; i < nested.length; i++) {
+      checkAbort(id);
+
+      const path = nested[i];
+
+      log("Mở nested pack: " + path, "ok");
+
+      const bytes = await zip.file(path).async("arraybuffer");
+      checkAbort(id);
+
+      const inner = await loadZipSafely(bytes, id);
+
+      const res = await analyzeArchive(
+        inner,
+        {
+          skipNested: false,
+          isOuter: false,
+          archiveLabel: path,
+          outerPath: path,
+          progressBase: 30 + (i / Math.max(1, nested.length)) * 60,
+          progressSpan: 60 / Math.max(1, nested.length)
+        },
+        id
+      );
+
+      res.decisions.forEach(function(d) {
+        decisions.push(
+          makeDecision(Object.assign({}, d, {
+            isNested: true,
+            isOuter: false,
+            outerPath: path,
+            innerName: d.name,
+            sourceArchive: path
+          }))
+        );
+      });
+
+      res.graphEdges.forEach(function(e) {
+        graphEdges.push(Object.assign({}, e, { archive: path }));
+      });
+
+      res.unusedCandidates.forEach(function(n) {
+        unusedCandidates.push({
+          archive: path,
+          name: n
+        });
+      });
+
+      res.dynamicFiles.forEach(function(x) {
+        dynamicFiles.push(
+          Object.assign({}, x, { archive: path })
+        );
+      });
+
+      stats.files += res.stats.files;
+      stats.text += res.stats.text;
+      stats.json += res.stats.json;
+      stats.mcfunction += res.stats.mcfunction;
+      stats.js += res.stats.js;
+      stats.edges += res.graphEdges.length;
+      stats.unusedCandidates += res.unusedCandidates.length;
+      stats.reviewCandidates += res.stats.reviewCandidates;
+      stats.safeCandidates += res.stats.safeCandidates;
+      stats.dynamicFiles += res.dynamicFiles.length;
+      stats.totalUncompressed += res.stats.totalUncompressed;
+
+      packResults.push({
+        outerPath: path,
+        isOuter: false,
+        decisions: res.decisions,
+        originalZip: inner,
+        analysis: res,
+        hasSelectedChanges: false
+      });
+
+      await yieldToUI();
+    }
+
+    const hasBP = { value: false };
+    const hasRP = { value: false };
+    const hasScript = { value: false };
+
+    for (const d of decisions) {
+      if (!isManifest(d.name)) continue;
+      if (d.action === "delete") continue;
+
+      const ownerZip = findDecisionOwnerZip(d, packResults);
+      if (!ownerZip) continue;
+
+      try {
+        const data = await ownerZip.file(d.name).async("uint8array");
+        const json = safeJsonParse(new TextDecoder().decode(data));
+        const modules = Array.isArray(json.modules)
+          ? json.modules
+          : [];
+
+        modules.forEach(function(mod) {
+          if (!mod) return;
+          if (mod.type === "data") hasBP.value = true;
+          if (mod.type === "resources") hasRP.value = true;
+          if (mod.type === "script") hasScript.value = true;
+        });
+      } catch (_) {}
+    }
+
+    updateSelectionFromPresetOnList(decisions);
+
+    return {
+      decisions: decisions,
+      graphEdges: dedupeGraphEdges(graphEdges),
+      unusedCandidates: unusedCandidates,
+      dynamicFiles: dedupeDynamicFiles(dynamicFiles),
+      packResults: packResults,
+      stats: stats,
+      targetVersion: selectedVersion,
+      preset: selectedPreset,
+      hasBP: hasBP.value,
+      hasRP: hasRP.value,
+      hasScript: hasScript.value,
+      isNestedMcaddon: isNestedContainer,
+      manifestCount: decisions.filter(function(d) {
+        return isManifest(d.name) && !d.isContainer;
+      }).length,
+      originalSize: originalSize,
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  function updateSelectionFromPresetOnList(list) {
+    list.forEach(function(d) {
+      d.selected = defaultSelectedForDecision(d);
+
+      if (d.action === "review") {
+        d.selected = false;
+      }
+    });
+  }
+
+  function findDecisionOwnerZip(decision, packResults) {
+    if (decision.sourceArchive === "outer") {
+      const outer = packResults.find(function(p) {
+        return p.isOuter;
+      });
+      return outer ? outer.originalZip : null;
+    }
+
+    const p = packResults.find(function(x) {
+      return x.outerPath === decision.sourceArchive;
+    });
+
+    return p ? p.originalZip : null;
+  }
+
+  function dedupeGraphEdges(edges) {
+    const seen = new Set();
+    const out = [];
+
+    for (const e of edges) {
+      const key = [
+        e.archive || "",
+        e.from || "",
+        e.to || "",
+        e.kind || ""
+      ].join("\u0001");
+
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(e);
+    }
+
+    return out;
+  }
+
+  function dedupeDynamicFiles(files) {
+    const seen = new Map();
+
+    files.forEach(function(item) {
+      const key = (item.archive || "") + "\u0001" + item.name;
+
+      if (!seen.has(key)) {
+        seen.set(key, {
+          archive: item.archive,
+          name: item.name,
+          reasons: item.reasons.slice()
+        });
+      }
+    });
+
+    return Array.from(seen.values());
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * ANALYSIS BUTTON
+   * ------------------------------------------------------------
+   */
+
+  btnAnalyze.addEventListener("click", async function() {
+    if (!originalFile || isProcessing) return;
+
+    const opId = beginOperation();
+
+    btnCancel.classList.remove("hidden");
+    btnAnalyze.disabled = true;
+    btnAI.disabled = true;
+
+    setStatus("Đang đọc archive và dựng dependency graph...");
+    log("=== BẮT ĐẦU PHÂN TÍCH v2.0 ===");
+    log("Preset: " + presetName(selectedPreset));
+    log("Target: " + selectedVersion);
+    setProgress(3);
+
+    try {
+      originalZip = await loadZipSafely(originalFile, opId);
+      checkAbort(opId);
+
+      const files = validateZipEntries(originalZip)
+        .filter(function(n) {
+          return !originalZip.files[n].dir;
+        });
+
+      if (!files.length) {
+        throw new Error("Archive không chứa file.");
+      }
+
+      log(
+        "Tìm thấy " + files.length + " file trong archive",
+        "ok"
+      );
+
+      const nested = findNestedMcpacks(originalZip);
+
+      if (nested.length) {
         log(
-          "Manifest không parse được → KEEP.",
+          "Phát hiện " +
+          nested.length +
+          " nested .mcpack",
+          "ok"
+        );
+      }
+
+      analysisResult = await buildAnalysisModel(
+        originalZip,
+        opId
+      );
+
+      checkAbort(opId);
+
+      renderAnalysisSummary();
+      renderGraph();
+      renderProposal();
+
+      analysisCard.classList.remove("hidden");
+      graphCard.classList.remove("hidden");
+      proposalCard.classList.remove("hidden");
+      reportCard.classList.remove("hidden");
+
+      btnAI.disabled = false;
+      btnApply.classList.remove("hidden");
+      btnApply.disabled = countSelected() === 0;
+
+      reportData = buildReportData();
+
+      setProgress(100);
+      setStatus("Phân tích xong. Kiểm tra đề xuất rồi áp dụng mục đã chọn.");
+
+      log("Dependency edges: " + analysisResult.graphEdges.length, "ok");
+      log("Unused candidates: " + analysisResult.unusedCandidates.length, "ok");
+      log("Dynamic JS files: " + analysisResult.dynamicFiles.length, analysisResult.dynamicFiles.length ? "warn" : "ok");
+      log("Không tự sửa min_engine_version/schema/API", "ok");
+    } catch (err) {
+      if (err.message === "Aborted") {
+        if (isCurrentOperation(opId)) {
+          log("Đã hủy phân tích", "warn");
+          setStatus("Đã hủy");
+        }
+      } else if (isCurrentOperation(opId)) {
+        console.error(err);
+        log("Lỗi phân tích: " + err.message, "err");
+        setStatus("Lỗi phân tích");
+      }
+    } finally {
+      if (isCurrentOperation(opId)) {
+        finishOperation(opId);
+        btnAnalyze.disabled = !originalFile;
+        btnAI.disabled = !originalFile;
+      }
+    }
+  });
+
+  /*
+   * ------------------------------------------------------------
+   * AI/LITE BUTTON — LOCAL HEURISTIC
+   * ------------------------------------------------------------
+   */
+
+  btnAI.addEventListener("click", async function() {
+    if (!originalFile || isProcessing) return;
+
+    /*
+     * Nút này không gọi external AI API.
+     * Nó chạy lại pipeline phân tích local và tạo proposal.
+     */
+    const opId = beginOperation();
+
+    btnCancel.classList.remove("hidden");
+    btnAnalyze.disabled = true;
+    btnAI.disabled = true;
+    btnApply.disabled = true;
+
+    setStatus("Đang tạo đề xuất Lite bằng heuristic local...");
+    log("=== TẠO ĐỀ XUẤT BẢN LITE ===");
+    setProgress(2);
+
+    try {
+      if (!originalZip) {
+        originalZip = await loadZipSafely(originalFile, opId);
+      }
+
+      analysisResult = await buildAnalysisModel(
+        originalZip,
+        opId
+      );
+
+      checkAbort(opId);
+
+      renderAnalysisSummary();
+      renderGraph();
+      renderProposal();
+
+      analysisCard.classList.remove("hidden");
+      graphCard.classList.remove("hidden");
+      proposalCard.classList.remove("hidden");
+      reportCard.classList.remove("hidden");
+
+      reportData = buildReportData();
+
+      btnApply.classList.remove("hidden");
+      btnApply.disabled = countSelected() === 0;
+
+      setProgress(100);
+      setStatus(
+        countSelected() > 0
+          ? "Có mục an toàn đã được chọn. Kiểm tra rồi bấm Áp dụng."
+          : "Không có mục tự động chọn. Có thể xem REVIEW."
+      );
+
+      log(
+        "Tạo proposal xong: " +
+        countSelectableProposals() +
+        " mục có thể lựa chọn",
+        "ok"
+      );
+
+      if (analysisResult.stats.unusedCandidates) {
+        log(
+          "Asset chưa tìm thấy reference chỉ được REVIEW, không auto-delete.",
           "warn"
         );
       }
 
-      setProgress(
-        30+
-        ((i+1)/Math.max(1,manifests.length))*20,
-        op
-      );
-
-      await yieldToUI();
-    }
-
-    const extCount={};
-
-    for(let i=0;i<files.length;i++){
-      checkAbort(op);
-
-      const ext=getExtension(files[i]);
-
-      extCount[ext]=
-        (extCount[ext]||0)+1;
-
-      if(i%40===0){
-        setProgress(
-          50+
-          (i/Math.max(1,files.length))*45,
-          op
-        );
-
-        await yieldToUI();
-      }
-    }
-
-    const extText=
-      Object.keys(extCount)
-      .sort(
-        (a,b)=>extCount[b]-extCount[a]
-      )
-      .slice(0,10)
-      .map(
-        ext=>"."+ext+":"+extCount[ext]
-      )
-      .join(", ");
-
-    log(
-      "Manifest: "+manifests.length+
-      " | BP: "+(hasBP?"Có":"Không")+
-      " | RP: "+(hasRP?"Có":"Không")+
-      " | Script: "+(hasScript?"Có":"Không"),
-      "ok"
-    );
-
-    log(
-      "Phân bố file: "+extText
-    );
-
-    setProgress(100,op);
-    setStatus("Phân tích xong.",op);
-
-    log(
-      "Phân tích hoàn tất.",
-      "ok"
-    );
-
-  }catch(error){
-    if(isAbortError(error)){
-      log("Đã hủy phân tích.","warn");
-      setStatus("Đã hủy",op);
-    }else{
-      log(
-        "Lỗi phân tích: "+error.message,
-        "err"
-      );
-      setStatus("Lỗi phân tích",op);
-    }
-  }finally{
-    if(activeOperation===op){
-      finishOperation(op);
-      btnAnalyze.disabled=!originalFile;
-      btnAI.disabled=!originalFile;
-    }
-  }
-});
-
-
-/* =========================================================
-   CREATE LITE
-   ========================================================= */
-
-btnAI.addEventListener("click",async()=>{
-  if(!originalFile||isProcessing) return;
-
-  const op=beginOperation();
-
-  const targetVersion=
-    selectedVersion.split(".").map(Number);
-
-  btnAnalyze.disabled=true;
-  btnAI.disabled=true;
-
-  btnApply.disabled=true;
-  btnApply.classList.add("hidden");
-
-  btnDownload.disabled=true;
-  btnDownload.classList.add("hidden");
-
-  proposalCard.classList.add("hidden");
-  analysisCard.classList.add("hidden");
-
-  optimizedBlob=null;
-  optimizedName="";
-
-  btnCancel.classList.remove("hidden");
-
-  setProgress(0,op);
-  setStatus(
-    "Đang phân tích và tạo đề xuất Lite...",
-    op
-  );
-
-  log("=== TẠO BẢN LITE v1.2 ===");
-
-  let sourceZip=null;
-
-  try{
-    sourceZip=
-      await loadZip(
-        originalFile,
-        op
-      );
-
-    const outerFiles=
-      getZipFiles(sourceZip);
-
-    const nestedMode=
-      isMcaddon(originalFile.name);
-
-    const nestedPacks=
-      nestedMode
-        ?outerFiles.filter(isMcpack)
-        :[];
-
-    const allDecisions=[];
-    const packResults=[];
-
-    if(nestedPacks.length){
-
-      log(
-        "Phát hiện "+nestedPacks.length+
-        " .mcpack.",
-        "ok"
-      );
-
-      for(const name of outerFiles){
-        if(nestedPacks.includes(name))
-          continue;
-
-        const entry=sourceZip.file(name);
-
-        let size=0;
-
-        if(
-          entry&&
-          entry._data&&
-          Number.isFinite(
-            entry._data.uncompressedSize
-          )
-        ){
-          size=
-            entry._data.uncompressedSize;
-        }
-
-        allDecisions.push({
-          name,
-          displayName:name,
-          action:"keep",
-          reason:
-            "File ngoài .mcpack → giữ nguyên",
-          origSize:size,
-          newSize:null,
-          outerPath:name,
-          outerFile:true,
-          confidence:"high"
-        });
-      }
-
-      for(
-        let i=0;
-        i<nestedPacks.length;
-        i++
-      ){
-        checkAbort(op);
-
-        const packPath=nestedPacks[i];
-
-        setStatus(
-          "Phân tích "+packPath,
-          op
-        );
-
+      if (analysisResult.dynamicFiles.length) {
         log(
-          "Mở nested pack: "+packPath
+          "JS dynamic → KEEP/REVIEW, không xóa dead code bằng regex.",
+          "warn"
         );
-
-        const outerEntry=
-          sourceZip.file(packPath);
-
-        if(!outerEntry) continue;
-
-        let innerBlob;
-
-        try{
-          innerBlob=
-            await outerEntry.async("blob");
-
-          checkAbort(op);
-        }catch(_){
-          allDecisions.push({
-            name:packPath,
-            displayName:packPath,
-            action:"keep",
-            reason:
-              ".mcpack không đọc được → KEEP",
-            origSize:
-              outerEntry._data &&
-              Number.isFinite(
-                outerEntry._data.uncompressedSize
-              )
-                ?outerEntry._data.uncompressedSize
-                :0,
-            newSize:null,
-            outerPath:packPath,
-            corruptNested:true,
-            confidence:"high"
-          });
-
-          packResults.push({
-            outerPath:packPath,
-            decisions:[],
-            skip:true
-          });
-
-          continue;
-        }
-
-        let innerZip;
-
-        try{
-          innerZip=
-            await loadZip(
-              innerBlob,
-              op
-            );
-        }catch(_){
-          allDecisions.push({
-            name:packPath,
-            displayName:packPath,
-            action:"keep",
-            reason:
-              ".mcpack corrupt → KEEP",
-            origSize:innerBlob.size,
-            newSize:null,
-            outerPath:packPath,
-            corruptNested:true,
-            confidence:"high"
-          });
-
-          packResults.push({
-            outerPath:packPath,
-            decisions:[],
-            skip:true
-          });
-
-          innerBlob=null;
-          continue;
-        }
-
-        innerBlob=null;
-
-        const baseProgress=
-          10+
-          (
-            i/
-            Math.max(1,nestedPacks.length)
-          )*80;
-
-        const span=
-          80/
-          Math.max(1,nestedPacks.length);
-
-        const decisions=
-          await optimizePack(
-            innerZip,
-            op,
-            baseProgress,
-            span,
-            targetVersion
-          );
-
-        const codeNames=
-          decisions
-          .filter(
-            d=>
-              isJavaScript(d.name)||
-              isMcfunction(d.name)
-          )
-          .map(d=>d.name);
-
-        /*
-         * Reference scan toàn inner pack.
-         */
-        const refs=
-          await scanReferences(
-            innerZip,
-            codeNames,
-            op
-          );
-
-        for(const d of decisions){
-          if(
-            d.action==="review" &&
-            (
-              isJavaScript(d.name)||
-              isMcfunction(d.name)
-            )
-          ){
-            const count=
-              refs.get(d.name)||0;
-
-            d.referenceCount=count;
-
-            if(count>0){
-              d.reason+=
-                " | Có reference trong pack → KEEP để an toàn";
-              d.confidence="high";
-
-              /*
-               * REVIEW không được tự xóa.
-               */
-            }
-          }
-
-          allDecisions.push({
-            name:
-              packPath+" / "+d.name,
-
-            displayName:
-              packPath+" / "+d.name,
-
-            action:d.action,
-            reason:d.reason,
-            origSize:d.origSize,
-            newSize:d.newSize,
-            transform:d.transform,
-            confidence:d.confidence,
-            outerPath:packPath,
-            innerName:d.name,
-            nestedFile:true,
-            referenceCount:d.referenceCount||0
-          });
-        }
-
-        const stats=
-          calculateStats(decisions);
-
-        packResults.push({
-          outerPath:packPath,
-          decisions,
-          skip:false,
-          hasChanges:stats.changed>0
-        });
-
-        innerZip=null;
-
-        await yieldToUI();
       }
-
-    }else{
-
-      log(
-        "Xử lý như single pack / flat ZIP."
-      );
-
-      const decisions=
-        await optimizePack(
-          sourceZip,
-          op,
-          10,
-          80,
-          targetVersion
-        );
-
-      const codeNames=
-        decisions
-        .filter(
-          d=>
-            isJavaScript(d.name)||
-            isMcfunction(d.name)
-        )
-        .map(d=>d.name);
-
-      const refs=
-        await scanReferences(
-          sourceZip,
-          codeNames,
-          op
-        );
-
-      for(const d of decisions){
-        if(
-          d.action==="review" &&
-          (
-            isJavaScript(d.name)||
-            isMcfunction(d.name)
-          )
-        ){
-          d.referenceCount=
-            refs.get(d.name)||0;
+    } catch (err) {
+      if (err.message === "Aborted") {
+        if (isCurrentOperation(opId)) {
+          log("Đã hủy tạo proposal", "warn");
+          setStatus("Đã hủy");
         }
-
-        allDecisions.push({
-          name:d.name,
-          displayName:d.name,
-          action:d.action,
-          reason:d.reason,
-          origSize:d.origSize,
-          newSize:d.newSize,
-          transform:d.transform,
-          confidence:d.confidence,
-          outerPath:d.name,
-          innerName:d.name,
-          flatFile:true,
-          referenceCount:d.referenceCount||0
-        });
+      } else if (isCurrentOperation(opId)) {
+        console.error(err);
+        log("Lỗi tạo proposal: " + err.message, "err");
+        setStatus("Lỗi tạo proposal");
       }
-
-      const stats=
-        calculateStats(decisions);
-
-      packResults.push({
-        outerPath:null,
-        decisions,
-        skip:false,
-        hasChanges:stats.changed>0,
-        flat:true
-      });
+    } finally {
+      if (isCurrentOperation(opId)) {
+        finishOperation(opId);
+        btnAnalyze.disabled = !originalFile;
+        btnAI.disabled = !originalFile;
+        btnApply.disabled = !analysisResult || countSelected() === 0;
+      }
     }
+  });
 
-    checkAbort(op);
+  /*
+   * ------------------------------------------------------------
+   * RENDER ANALYSIS
+   * ------------------------------------------------------------
+   */
 
-    const stats=
-      calculateStats(allDecisions);
+  function renderAnalysisSummary() {
+    if (!analysisResult) return;
 
-    analysisResult={
-      decisions:allDecisions,
-      packResults,
-      nested:nestedPacks.length>0,
-      targetVersion:targetVersion.slice(),
-      targetVersionText:selectedVersion,
-      stats
-    };
+    const s = analysisResult.stats;
 
-    renderProposal(allDecisions);
+    document.getElementById("statFiles").textContent = String(s.files);
+    document.getElementById("statText").textContent = String(s.text);
+    document.getElementById("statEdges").textContent = String(analysisResult.graphEdges.length);
+    document.getElementById("statUnused").textContent = String(analysisResult.unusedCandidates.length);
 
-    proposalCard.classList.remove("hidden");
-    btnApply.classList.remove("hidden");
-    btnApply.disabled=false;
+    document.getElementById("jsStats").textContent =
+      s.js +
+      " file • " +
+      analysisResult.dynamicFiles.length +
+      " dynamic";
 
-    analysisCard.classList.remove("hidden");
+    document.getElementById("mcfunctionStats").textContent =
+      s.mcfunction + " file";
 
-    const jsTotal=
-      allDecisions.filter(
-        d=>isJavaScript(d.innerName||d.name)
-      ).length;
+    document.getElementById("dynamicStats").textContent =
+      analysisResult.dynamicFiles.length
+        ? analysisResult.dynamicFiles.length + " REVIEW/KEEP"
+        : "Không phát hiện";
 
-    const mcTotal=
-      allDecisions.filter(
-        d=>isMcfunction(d.innerName||d.name)
-      ).length;
+    document.getElementById("safetyStats").textContent =
+      s.safeCandidates +
+      " SAFE • " +
+      s.reviewCandidates +
+      " REVIEW";
 
-    const reviewTotal=
-      allDecisions.filter(
-        d=>d.action==="review"
-      ).length;
-
-    document.getElementById("jsStats")
-      .textContent=
-        jsTotal+" file được quét";
-
-    document.getElementById("mcfunctionStats")
-      .textContent=
-        mcTotal+" file được quét";
-
-    document.getElementById("referenceStats")
-      .textContent=
-        reviewTotal+
-        " đề xuất cần REVIEW";
-
-    document.getElementById("safetyStats")
-      .textContent=
-        "Không chắc → KEEP";
-
-    setProgress(100,op);
-
-    log(
-      "Đề xuất: "+
-      stats.keep+" giữ / "+
-      stats.optimize+" tối ưu / "+
-      stats.review+" review / "+
-      stats.delete+" xóa.",
-      "ok"
-    );
-
-    log(
-      "Tiết kiệm nội dung ước tính: "+
-      formatSize(stats.estimatedSaved)
-    );
-
-    log(
-      "JS: chỉ sửa lexical-safe code.",
-      "ok"
-    );
-
-    log(
-      "MCFunction: chỉ bỏ comment/blank line an toàn.",
-      "ok"
-    );
-
-    log(
-      "Function/variable nghi không dùng: REVIEW, không tự xóa.",
-      "ok"
-    );
-
-    log(
-      "Dynamic JS code: KEEP.",
-      "ok"
-    );
-
-    log(
-      "Reference không chắc chắn: KEEP.",
-      "ok"
-    );
-
-    log(
-      ".mcstructure: KEEP nguyên byte.",
-      "ok"
-    );
-
-    log(
-      "Texture PNG/JPG/TGA: KEEP nguyên.",
-      "ok"
-    );
-
-    log(
-      "Manifest target mismatch: REVIEW, không tự đổi min_engine_version.",
-      "ok"
-    );
-
-    setStatus(
-      "Đã tạo đề xuất → kiểm tra rồi bấm Áp dụng.",
-      op
-    );
-
-  }catch(error){
-
-    if(isAbortError(error)){
-      log(
-        "Đã hủy tạo bản Lite.",
-        "warn"
-      );
-
-      setStatus("Đã hủy",op);
-      analysisResult=null;
-
-    }else{
-      log(
-        "Lỗi tạo bản Lite: "+error.message,
-        "err"
-      );
-
-      setStatus(
-        "Không thể tạo bản Lite",
-        op
-      );
-
-      analysisResult=null;
-    }
-
-  }finally{
-
-    sourceZip=null;
-
-    if(activeOperation===op){
-      finishOperation(op);
-      btnAnalyze.disabled=!originalFile;
-      btnAI.disabled=!originalFile;
-    }
-  }
-});
-
-
-/* =========================================================
-   PROPOSAL UI
-   ========================================================= */
-
-function renderProposal(decisions){
-  proposalList.textContent="";
-
-  const order={
-    delete:0,
-    optimize:1,
-    review:2,
-    keep:3
-  };
-
-  const sorted=
-    decisions.slice().sort(
-      (a,b)=>
-        (
-          order[a.action]??3
-        )-
-        (
-          order[b.action]??3
-        )
-    );
-
-  const visible=
-    sorted
-    .filter(
-      d=>
-        d.action!=="keep"||
-        d.origSize>50*1024
-    )
-    .slice(0,200);
-
-  for(const d of visible){
-    const row=document.createElement("div");
-
-    row.className=
-      "file-item "+d.action;
-
-    row.title=d.reason||"";
-
-    const name=document.createElement("div");
-
-    name.style.cssText=
-      "overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1";
-
-    name.textContent=
-      d.displayName||d.name;
-
-    const right=document.createElement("div");
-
-    right.style.cssText=
-      "display:flex;gap:6px;align-items:center";
-
-    const size=document.createElement("span");
-
-    size.style.cssText=
-      "color:var(--muted);font-size:.75rem";
-
-    if(
-      d.newSize!==null &&
-      d.newSize!==undefined
-    ){
-      size.textContent=
-        formatSize(d.origSize)+
-        " → "+
-        formatSize(d.newSize);
-    }else{
-      size.textContent=
-        formatSize(d.origSize);
-    }
-
-    const badge=document.createElement("span");
-
-    badge.className=
-      "badge "+d.action;
-
-    badge.textContent=
-      d.action==="delete"
-        ?"XÓA"
-        :d.action==="optimize"
-          ?"TỐI ƯU"
-          :d.action==="review"
-            ?"REVIEW"
-            :"GIỮ";
-
-    right.appendChild(size);
-    right.appendChild(badge);
-
-    row.appendChild(name);
-    row.appendChild(right);
-
-    proposalList.appendChild(row);
+    analysisModeChip.textContent =
+      presetName(selectedPreset) +
+      " • " +
+      selectedVersion;
   }
 
-  if(sorted.length>visible.length){
-    const more=document.createElement("div");
+  function renderGraph() {
+    if (!analysisResult) return;
 
-    more.className="file-item";
+    while (graphList.firstChild) {
+      graphList.removeChild(graphList.firstChild);
+    }
 
-    more.textContent=
-      "... còn "+
-      (
-        sorted.length-visible.length
-      )+
-      " file khác";
+    const edges = analysisResult.graphEdges.slice(0, MAX_GRAPH_EDGES_UI);
+    graphCountChip.textContent =
+      analysisResult.graphEdges.length +
+      " edges";
 
-    proposalList.appendChild(more);
-  }
-}
-
-
-/* =========================================================
-   APPLY
-   ========================================================= */
-
-btnApply.addEventListener("click",async()=>{
-  if(
-    !analysisResult||
-    !originalFile||
-    isProcessing
-  ) return;
-
-  const op=beginOperation();
-
-  btnApply.disabled=true;
-  btnAI.disabled=true;
-  btnAnalyze.disabled=true;
-
-  btnDownload.disabled=true;
-  btnDownload.classList.add("hidden");
-
-  optimizedBlob=null;
-  optimizedName="";
-
-  btnCancel.classList.remove("hidden");
-
-  setProgress(0,op);
-  setStatus(
-    "Đang áp dụng thay đổi...",
-    op
-  );
-
-  log("=== APPLY BẢN LITE v1.2 ===");
-
-  try{
-    const result=analysisResult;
-
-    if(result.stats.changed===0){
-      optimizedBlob=originalFile;
-
-      optimizedName=
-        originalFile.name.replace(
-          /\.(mcaddon|mcpack|zip)$/i,
-          ""
-        )+
-        "_Lite"+
-        (
-          originalFile.name.match(
-            /\.(mcaddon|mcpack|zip)$/i
-          )?.[0]||".zip"
-        );
-
-      setProgress(100,op);
-
-      setStatus(
-        "Không có thay đổi an toàn → giữ nguyên archive.",
-        op
-      );
-
-      showFinalStats(
-        optimizedBlob,
-        result,
-        op
-      );
-
-      log(
-        "Không có thay đổi đủ chắc chắn. Giữ nguyên archive.",
-        "ok"
-      );
-
+    if (!edges.length) {
+      const empty = document.createElement("div");
+      empty.className = "file-item";
+      empty.textContent = "Chưa tìm thấy edge rõ ràng.";
+      graphList.appendChild(empty);
       return;
     }
 
-    if(result.nested){
+    edges.forEach(function(edge) {
+      const row = document.createElement("div");
+      row.className = "graph-edge";
 
-      const outerZip=
-        await loadZip(
-          originalFile,
-          op
-        );
+      const left = document.createElement("span");
+      left.textContent =
+        (edge.archive ? "[" + edge.archive + "] " : "") +
+        edge.from;
 
-      let anyActualChange=false;
+      const arrow = document.createElement("span");
+      arrow.className = "arrow";
+      arrow.textContent = "→";
 
-      for(
-        let i=0;
-        i<result.packResults.length;
-        i++
-      ){
-        checkAbort(op);
+      const right = document.createElement("span");
+      right.textContent = edge.to;
 
-        const pack=
-          result.packResults[i];
+      const kind = document.createElement("span");
+      kind.className = "kind";
+      kind.textContent =
+        " • " +
+        edge.kind +
+        (edge.resolved ? " • resolved" : " • unresolved");
 
-        if(
-          pack.skip||
-          !pack.hasChanges
-        ) continue;
+      row.appendChild(left);
+      row.appendChild(arrow);
+      row.appendChild(right);
+      row.appendChild(kind);
 
-        const outerEntry=
-          outerZip.file(
-            pack.outerPath
-          );
+      graphList.appendChild(row);
+    });
 
-        if(!outerEntry)
-          throw new Error(
-            "Nested pack biến mất: "+
-            pack.outerPath
-          );
+    if (analysisResult.graphEdges.length > edges.length) {
+      const more = document.createElement("div");
+      more.className = "file-item";
+      more.textContent =
+        "... và " +
+        (analysisResult.graphEdges.length - edges.length) +
+        " edge khác";
+      graphList.appendChild(more);
+    }
+  }
 
-        setStatus(
-          "Đang áp dụng "+
-          pack.outerPath,
-          op
-        );
+  function countSelectableProposals() {
+    if (!analysisResult) return 0;
 
-        const innerBlob=
-          await outerEntry.async("blob");
+    return analysisResult.decisions.filter(function(d) {
+      return d.action !== "keep";
+    }).length;
+  }
 
-        checkAbort(op);
+  function countSelected() {
+    if (!analysisResult) return 0;
 
-        const innerZip=
-          await loadZip(
-            innerBlob,
-            op
-          );
+    return analysisResult.decisions.filter(function(d) {
+      return d.selected;
+    }).length;
+  }
 
-        const changed=
-          await applyDecisions(
-            innerZip,
-            pack.decisions,
-            op,
-            10+
-            (
-              i/
-              Math.max(
-                1,
-                result.packResults.length
-              )
-            )*65,
-            65/
-            Math.max(
-              1,
-              result.packResults.length
-            )
-          );
+  function renderProposal() {
+    if (!analysisResult) return;
 
-        checkAbort(op);
+    while (proposalList.firstChild) {
+      proposalList.removeChild(proposalList.firstChild);
+    }
 
-        if(!changed){
-          pack.hasChanges=false;
-          continue;
+    const filter = proposalFilter.value;
+
+    const order = {
+      delete: 0,
+      optimize: 1,
+      review: 2,
+      keep: 3
+    };
+
+    const all = analysisResult.decisions.slice();
+
+    all.sort(function(a, b) {
+      if (order[a.action] !== order[b.action]) {
+        return order[a.action] - order[b.action];
+      }
+
+      return a.name.localeCompare(b.name);
+    });
+
+    const filtered = all.filter(function(d) {
+      return filter === "all" || d.action === filter;
+    });
+
+    const visible = filtered.slice(0, MAX_PROPOSAL_UI);
+
+    proposalCountChip.textContent = String(
+      analysisResult.decisions.length
+    );
+
+    selectedCountChip.textContent =
+      countSelected() + " đã chọn";
+
+    visible.forEach(function(d) {
+      const row = document.createElement("div");
+      row.className = "file-item " + d.action;
+
+      const checkWrap = document.createElement("div");
+      checkWrap.className = "file-check";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = Boolean(d.selected);
+      checkbox.disabled = (
+        d.action === "keep" ||
+        (
+          d.action === "review" &&
+          !d.enabled
+        )
+      );
+
+      checkbox.addEventListener("change", function() {
+        d.selected = checkbox.checked;
+        selectedCountChip.textContent = countSelected() + " đã chọn";
+        btnApply.disabled = countSelected() === 0;
+        reportData = buildReportData();
+      });
+
+      checkWrap.appendChild(checkbox);
+
+      const main = document.createElement("div");
+      main.className = "file-main";
+
+      const name = document.createElement("div");
+      name.className = "file-name";
+      name.textContent =
+        (d.sourceArchive && d.sourceArchive !== "outer"
+          ? d.sourceArchive + " / "
+          : "") +
+        d.name;
+      name.title = name.textContent;
+
+      const reason = document.createElement("div");
+      reason.className = "file-reason";
+      reason.textContent = d.reason;
+
+      main.appendChild(name);
+      main.appendChild(reason);
+
+      const right = document.createElement("div");
+      right.className = "file-right";
+
+      const sizeSpan = document.createElement("span");
+      sizeSpan.style.cssText = "color:var(--muted);font-size:.72rem";
+      sizeSpan.textContent =
+        d.newSize != null
+          ? formatSize(d.origSize) +
+            " → " +
+            formatSize(d.newSize)
+          : formatSize(d.origSize);
+
+      const badge = document.createElement("span");
+      badge.className = "badge " + d.action;
+      badge.textContent = actionLabel(d.action);
+
+      right.appendChild(sizeSpan);
+      right.appendChild(badge);
+
+      row.appendChild(checkWrap);
+      row.appendChild(main);
+      row.appendChild(right);
+
+      proposalList.appendChild(row);
+    });
+
+    if (filtered.length > visible.length) {
+      const more = document.createElement("div");
+      more.className = "file-item";
+      more.textContent =
+        "... và " +
+        (filtered.length - visible.length) +
+        " mục khác";
+      proposalList.appendChild(more);
+    }
+
+    btnApply.disabled = countSelected() === 0;
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * APPLY HELPERS
+   * ------------------------------------------------------------
+   */
+
+  function getSelectedForPack(pack) {
+    return pack.decisions.filter(function(d) {
+      return d.selected;
+    });
+  }
+
+  function decisionMatchesRoot(decision) {
+    return (
+      decision.isOuter &&
+      !decision.isNested
+    );
+  }
+
+  async function copyEntryIntoZip(sourceZip, destZip, entryName, id) {
+    checkAbort(id);
+
+    const entry = sourceZip.file(entryName);
+
+    if (!entry) {
+      throw new Error("Không tìm thấy entry: " + entryName);
+    }
+
+    const bytes = await entry.async("uint8array");
+    checkAbort(id);
+
+    destZip.file(
+      entryName,
+      bytes,
+      {
+        binary: true,
+        createFolders: false
+      }
+    );
+  }
+
+  function selectedChangesExist(pack) {
+    return pack.decisions.some(function(d) {
+      return d.selected;
+    });
+  }
+
+  async function rebuildInnerPack(pack, id, progressStart, progressSpan) {
+    checkAbort(id);
+
+    const newInner = new JSZip();
+    const decisions = pack.decisions;
+
+    for (let i = 0; i < decisions.length; i++) {
+      checkAbort(id);
+
+      const d = decisions[i];
+
+      if (d.selected && d.action === "delete") {
+        continue;
+      }
+
+      let payload = null;
+
+      if (
+        d.selected &&
+        d.newData &&
+        d.newData instanceof Uint8Array
+      ) {
+        payload = d.newData;
+      } else {
+        payload = await pack.originalZip
+          .file(d.name)
+          .async("uint8array");
+      }
+
+      checkAbort(id);
+
+      newInner.file(
+        d.name,
+        payload,
+        {
+          binary: true,
+          createFolders: false
         }
+      );
 
-        anyActualChange=true;
-
-        const newInnerBlob=
-          await innerZip.generateAsync(
-            {
-              type:"blob",
-              streamFiles:true,
-              compression:"DEFLATE",
-              compressionOptions:{
-                level:6
-              }
-            },
-            meta=>{
-              if(
-                activeOperation===op&&
-                !op.controller.signal.aborted
-              ){
-                setProgress(
-                  75+
-                  meta.percent*.15,
-                  op
-                );
-              }else{
-                throw new DOMException(
-                  "Operation aborted",
-                  "AbortError"
-                );
-              }
-            }
-          );
-
-        checkAbort(op);
-
-        await loadZip(
-          newInnerBlob,
-          op
+      if (i % 10 === 0) {
+        setProgress(
+          progressStart +
+          (i / Math.max(1, decisions.length)) *
+          progressSpan *
+          0.60
         );
-
-        outerZip.file(
-          pack.outerPath,
-          newInnerBlob,
-          {
-            binary:true,
-            createFolders:false
-          }
-        );
-
-        log(
-          "Đã rebuild "+pack.outerPath,
-          "ok"
-        );
-
         await yieldToUI();
       }
+    }
 
-      checkAbort(op);
+    checkAbort(id);
 
-      if(!anyActualChange){
-        optimizedBlob=originalFile;
-      }else{
-        setStatus(
-          "Đang nén .mcaddon cuối...",
-          op
-        );
+    const bytes = await newInner.generateAsync({
+      type: "uint8array",
+      compression: "DEFLATE",
+      compressionOptions: {
+        level: 6
+      }
+    });
 
-        optimizedBlob=
-          await outerZip.generateAsync(
-            {
-              type:"blob",
-              streamFiles:true,
-              compression:"DEFLATE",
-              compressionOptions:{
-                level:6
-              }
-            },
-            meta=>{
-              if(
-                activeOperation===op&&
-                !op.controller.signal.aborted
-              ){
-                setProgress(
-                  90+
-                  meta.percent*.1,
-                  op
-                );
-              }else{
-                throw new DOMException(
-                  "Operation aborted",
-                  "AbortError"
-                );
-              }
-            }
-          );
+    checkAbort(id);
+
+    return bytes;
+  }
+
+  async function rebuildOuterArchive(model, id) {
+    checkAbort(id);
+
+    const newOuter = new JSZip();
+    const nestedMap = new Map();
+
+    model.packResults
+      .filter(function(p) {
+        return !p.isOuter;
+      })
+      .forEach(function(pack) {
+        nestedMap.set(pack.outerPath, pack);
+      });
+
+    const outerPack = model.packResults.find(function(p) {
+      return p.isOuter;
+    });
+
+    if (!outerPack) {
+      throw new Error("Internal: outer pack missing.");
+    }
+
+    const outerDecisions = outerPack.decisions;
+
+    for (let i = 0; i < outerDecisions.length; i++) {
+      checkAbort(id);
+
+      const d = outerDecisions[i];
+
+      if (d.selected && d.action === "delete") {
+        continue;
       }
 
-    }else{
+      if (d.isContainer && nestedMap.has(d.name)) {
+        const nestedPack = nestedMap.get(d.name);
+        let payload;
 
-      const zip=
-        await loadZip(
-          originalFile,
-          op
-        );
-
-      const pack=
-        result.packResults[0];
-
-      const changed=
-        await applyDecisions(
-          zip,
-          pack.decisions,
-          op,
-          10,
-          70
-        );
-
-      checkAbort(op);
-
-      if(!changed){
-        optimizedBlob=originalFile;
-      }else{
-        setStatus(
-          "Đang nén archive cuối...",
-          op
-        );
-
-        optimizedBlob=
-          await zip.generateAsync(
-            {
-              type:"blob",
-              streamFiles:true,
-              compression:"DEFLATE",
-              compressionOptions:{
-                level:6
-              }
-            },
-            meta=>{
-              if(
-                activeOperation===op&&
-                !op.controller.signal.aborted
-              ){
-                setProgress(
-                  80+
-                  meta.percent*.2,
-                  op
-                );
-              }else{
-                throw new DOMException(
-                  "Operation aborted",
-                  "AbortError"
-                );
-              }
-            }
+        if (selectedChangesExist(nestedPack)) {
+          payload = await rebuildInnerPack(
+            nestedPack,
+            id,
+            12 + (i / Math.max(1, outerDecisions.length)) * 55,
+            55 / Math.max(1, outerDecisions.length)
           );
+        } else {
+          payload = await outerPack.originalZip
+            .file(d.name)
+            .async("uint8array");
+        }
+
+        checkAbort(id);
+
+        newOuter.file(
+          d.name,
+          payload,
+          {
+            binary: true,
+            createFolders: false
+          }
+        );
+      } else {
+        let payload = null;
+
+        if (
+          d.selected &&
+          d.newData &&
+          d.newData instanceof Uint8Array
+        ) {
+          payload = d.newData;
+        } else {
+          payload = await outerPack.originalZip
+            .file(d.name)
+            .async("uint8array");
+        }
+
+        checkAbort(id);
+
+        newOuter.file(
+          d.name,
+          payload,
+          {
+            binary: true,
+            createFolders: false
+          }
+        );
+      }
+
+      if (i % 8 === 0) {
+        setProgress(
+          12 +
+          (i / Math.max(1, outerDecisions.length)) *
+          60
+        );
+        await yieldToUI();
       }
     }
 
-    checkAbort(op);
+    return newOuter;
+  }
 
-    if(optimizedBlob!==originalFile){
-      setStatus(
-        "Đang kiểm tra output...",
-        op
+  async function verifyJsonDecision(d, ownerZip, id) {
+    if (!d.selected || !d.newData) return;
+    if (!isJsonCandidate(d.name)) return;
+
+    checkAbort(id);
+
+    const text = new TextDecoder().decode(d.newData);
+    safeJsonParse(text);
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * INTEGRITY CHECK
+   * ------------------------------------------------------------
+   */
+
+  async function integrityCheck(blob, model, id) {
+    const checks = [];
+
+    function add(name, ok, detail, severity) {
+      checks.push({
+        name: name,
+        ok: ok,
+        detail: detail,
+        severity: severity || (ok ? "ok" : "bad")
+      });
+    }
+
+    checkAbort(id);
+
+    if (!(blob instanceof Blob) || blob.size <= 0) {
+      add(
+        "Output blob",
+        false,
+        "Blob rỗng hoặc không hợp lệ",
+        "bad"
       );
 
-      await verifyZipOutput(
-        optimizedBlob,
-        op
+      return {
+        ok: false,
+        checks: checks
+      };
+    }
+
+    add(
+      "Output blob",
+      true,
+      formatSize(blob.size)
+    );
+
+    let zip;
+
+    try {
+      zip = await loadZipSafely(blob, id);
+      add(
+        "Archive reload",
+        true,
+        "JSZip mở lại thành công"
+      );
+    } catch (e) {
+      add(
+        "Archive reload",
+        false,
+        e.message,
+        "bad"
+      );
+
+      return {
+        ok: false,
+        checks: checks
+      };
+    }
+
+    const names = validateZipEntries(zip)
+      .filter(function(n) {
+        return !zip.files[n].dir;
+      });
+
+    add(
+      "Archive entries",
+      names.length > 0,
+      names.length + " file"
+    );
+
+    const manifestNames = names.filter(function(n) {
+      return isManifest(n);
+    });
+
+    add(
+      "Manifest presence",
+      manifestNames.length > 0 || model.manifestCount === 0,
+      manifestNames.length +
+      " manifest ở outer archive" +
+      (model.manifestCount > manifestNames.length
+        ? " / " + model.manifestCount + " tổng theo analysis"
+        : "")
+    );
+
+    let jsonChecked = 0;
+    let jsonFailed = 0;
+    let jsChecked = 0;
+    let jsFailed = 0;
+    let nestedChecked = 0;
+    let nestedFailed = 0;
+
+    for (let i = 0; i < names.length; i++) {
+      checkAbort(id);
+
+      const name = names[i];
+
+      if (isJsonCandidate(name) && !isMcstructure(name)) {
+        try {
+          const data = await zip.file(name).async("string");
+          safeJsonParse(data);
+          jsonChecked++;
+        } catch (_) {
+          jsonFailed++;
+        }
+      }
+
+      if (/\.(js|mjs|cjs)$/i.test(name)) {
+        try {
+          const data = await zip.file(name).async("string");
+          jsChecked++;
+          if (!basicJsBalanceCheck(data)) {
+            jsFailed++;
+          }
+        } catch (_) {
+          jsFailed++;
+        }
+      }
+
+      if (isMcpack(name)) {
+        try {
+          const bytes = await zip.file(name).async("arraybuffer");
+          const inner = await JSZip.loadAsync(bytes, {
+            checkCRC32: false,
+            createFolders: false
+          });
+
+          validateZipEntries(inner);
+          const innerNames = Object.keys(inner.files).filter(function(n) {
+            return !inner.files[n].dir;
+          });
+
+          if (innerNames.length > 0) {
+            nestedChecked++;
+          } else {
+            nestedFailed++;
+          }
+        } catch (_) {
+          nestedFailed++;
+        }
+      }
+
+      if (i % 12 === 0) {
+        setProgress(
+          86 +
+          (i / Math.max(1, names.length)) *
+          12
+        );
+        await yieldToUI();
+      }
+    }
+
+    add(
+      "Changed JSON parse",
+      jsonFailed === 0,
+      jsonChecked + " checked / " + jsonFailed + " failed",
+      jsonFailed === 0 ? "ok" : "bad"
+    );
+
+    add(
+      "JS balance check",
+      jsFailed === 0,
+      jsChecked + " checked / " + jsFailed + " failed",
+      jsFailed === 0 ? "ok" : "warn"
+    );
+
+    if (nestedChecked || nestedFailed) {
+      add(
+        "Nested .mcpack",
+        nestedFailed === 0,
+        nestedChecked + " valid / " + nestedFailed + " failed",
+        nestedFailed === 0 ? "ok" : "bad"
       );
     }
 
-    checkAbort(op);
+    const ok = checks.every(function(c) {
+      return c.ok || c.severity === "warn";
+    });
 
-    optimizedName=
-      originalFile.name.replace(
+    return {
+      ok: ok,
+      checks: checks,
+      fileCount: names.length,
+      jsonChecked: jsonChecked,
+      jsonFailed: jsonFailed,
+      jsChecked: jsChecked,
+      jsFailed: jsFailed,
+      nestedChecked: nestedChecked,
+      nestedFailed: nestedFailed
+    };
+  }
+
+  function renderIntegrity(integrity) {
+    while (integrityList.firstChild) {
+      integrityList.removeChild(integrityList.firstChild);
+    }
+
+    integrityChip.textContent = integrity.ok
+      ? "PASS"
+      : "FAIL";
+
+    integrityChip.style.color = integrity.ok
+      ? "var(--success)"
+      : "var(--danger)";
+
+    integrity.checks.forEach(function(c) {
+      const row = document.createElement("div");
+      row.className = "info-row";
+
+      const left = document.createElement("span");
+      left.textContent = c.name;
+
+      const right = document.createElement("span");
+      right.textContent =
+        (c.ok ? "✅ " : "⚠️ ") +
+        c.detail;
+
+      if (c.severity === "bad") {
+        right.className = "integrity-bad";
+      } else if (c.severity === "warn") {
+        right.className = "integrity-warn";
+      } else if (c.ok) {
+        right.className = "integrity-ok";
+      }
+
+      row.appendChild(left);
+      row.appendChild(right);
+      integrityList.appendChild(row);
+    });
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * DIFF
+   * ------------------------------------------------------------
+   */
+
+  function buildDiff(model) {
+    const diffs = [];
+
+    model.decisions.forEach(function(d) {
+      let status = "unchanged";
+      let newSize = d.origSize;
+
+      if (d.selected && d.action === "delete") {
+        status = "deleted";
+        newSize = 0;
+      } else if (
+        d.selected &&
+        d.action === "optimize" &&
+        d.newSize != null
+      ) {
+        status = "optimized";
+        newSize = d.newSize;
+      } else if (
+        d.selected &&
+        d.action === "review" &&
+        d.newSize != null
+      ) {
+        status = "optimized";
+        newSize = d.newSize;
+      }
+
+      diffs.push({
+        name: d.name,
+        archive: d.sourceArchive,
+        status: status,
+        origSize: d.origSize,
+        newSize: newSize,
+        saved: d.origSize - newSize,
+        reason: d.reason
+      });
+    });
+
+    return diffs;
+  }
+
+  function renderDiff(diffs) {
+    while (diffList.firstChild) {
+      diffList.removeChild(diffList.firstChild);
+    }
+
+    const changed = diffs.filter(function(d) {
+      return d.status !== "unchanged";
+    });
+
+    diffCountChip.textContent = changed.length + " thay đổi";
+
+    const visible = changed.slice(0, MAX_DIFF_UI);
+
+    if (!visible.length) {
+      const empty = document.createElement("div");
+      empty.className = "file-item diff-keep";
+      empty.textContent = "Không có thay đổi file-level được chọn.";
+      diffList.appendChild(empty);
+      return;
+    }
+
+    visible.forEach(function(d) {
+      const row = document.createElement("div");
+      row.className =
+        "file-item " +
+        (
+          d.status === "deleted" ? "diff-del" :
+          d.status === "optimized" ? "diff-opt" :
+          "diff-keep"
+        );
+
+      const main = document.createElement("div");
+      main.className = "file-main";
+
+      const name = document.createElement("div");
+      name.className = "file-name";
+      name.textContent =
+        (d.archive && d.archive !== "outer"
+          ? d.archive + " / "
+          : "") +
+        d.name;
+
+      const detail = document.createElement("div");
+      detail.className = "file-reason";
+      detail.textContent =
+        formatSize(d.origSize) +
+        " → " +
+        formatSize(d.newSize) +
+        " • " +
+        d.reason;
+
+      main.appendChild(name);
+      main.appendChild(detail);
+
+      const badge = document.createElement("span");
+      badge.className = "badge " +
+        (
+          d.status === "deleted" ? "delete" :
+          d.status === "optimized" ? "optimize" :
+          "unchanged"
+        );
+      badge.textContent =
+        d.status === "deleted"
+          ? "DELETED"
+          : d.status === "optimized"
+            ? "OPTIMIZED"
+            : "UNCHANGED";
+
+      row.appendChild(main);
+      row.appendChild(badge);
+      diffList.appendChild(row);
+    });
+
+    if (changed.length > visible.length) {
+      const more = document.createElement("div");
+      more.className = "file-item";
+      more.textContent =
+        "... và " +
+        (changed.length - visible.length) +
+        " thay đổi khác";
+      diffList.appendChild(more);
+    }
+  }
+
+  /*
+   * ------------------------------------------------------------
+   * REPORT
+   * ------------------------------------------------------------
+   */
+
+  function getSelectedSummary() {
+    if (!analysisResult) {
+      return {
+        selected: 0,
+        deleted: 0,
+        optimized: 0,
+        reviewSelected: 0,
+        estimatedSaved: 0
+      };
+    }
+
+    const out = {
+      selected: 0,
+      deleted: 0,
+      optimized: 0,
+      reviewSelected: 0,
+      estimatedSaved: 0
+    };
+
+    analysisResult.decisions.forEach(function(d) {
+      if (!d.selected) return;
+
+      out.selected++;
+
+      if (d.action === "delete") out.deleted++;
+      if (d.action === "optimize") out.optimized++;
+      if (d.action === "review") out.reviewSelected++;
+
+      if (d.newSize != null) {
+        out.estimatedSaved +=
+          Math.max(0, d.origSize - d.newSize);
+      } else if (d.action === "delete") {
+        out.estimatedSaved += d.origSize;
+      }
+    });
+
+    return out;
+  }
+
+  function buildReportData() {
+    if (!analysisResult) return null;
+
+    const summary = getSelectedSummary();
+
+    return {
+      tool: "Minecraft Bedrock Addon Lite Optimizer",
+      version: "2.0",
+      generatedAt: new Date().toISOString(),
+      input: {
+        name: originalFile ? originalFile.name : "",
+        size: originalSize,
+        type: originalFile
+          ? originalFile.name.split(".").pop().toLowerCase()
+          : "",
+        targetVersion: selectedVersion
+      },
+      preset: presetName(selectedPreset),
+      options: {
+        allowJsReview: allowJsReview.checked,
+        allowUnusedReview: allowUnusedReview.checked
+      },
+      analysis: {
+        stats: analysisResult.stats,
+        isNestedMcaddon: analysisResult.isNestedMcaddon,
+        hasBP: analysisResult.hasBP,
+        hasRP: analysisResult.hasRP,
+        hasScript: analysisResult.hasScript,
+        dependencyEdges: analysisResult.graphEdges,
+        dynamicFiles: analysisResult.dynamicFiles,
+        unusedCandidates: analysisResult.unusedCandidates,
+        duplicateByteGroups: analysisResult.packResults
+          .map(function(p) {
+            return {
+              archive: p.outerPath || "outer",
+              groups: p.analysis.hashDuplicates
+            };
+          })
+      },
+      selection: summary,
+      decisions: analysisResult.decisions.map(function(d) {
+        return {
+          archive: d.sourceArchive,
+          name: d.name,
+          action: d.action,
+          selected: Boolean(d.selected),
+          safety: d.safety,
+          category: d.category,
+          reason: d.reason,
+          origSize: d.origSize,
+          newSize: d.newSize,
+          saved: d.saved
+        };
+      }),
+      diff: lastDiff,
+      integrity: lastIntegrity
+    };
+  }
+
+  function downloadTextFile(filename, text, mime) {
+    const blob = new Blob(
+      [text],
+      { type: mime || "text/plain;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+
+    try {
+      a.click();
+    } finally {
+      a.remove();
+      setTimeout(function() {
+        URL.revokeObjectURL(url);
+      }, 5000);
+    }
+  }
+
+  function reportToTxt(report) {
+    const lines = [];
+
+    lines.push("Minecraft Bedrock Addon Lite Optimizer v2.0");
+    lines.push("=".repeat(56));
+    lines.push("File: " + report.input.name);
+    lines.push("Original: " + formatSize(report.input.size));
+    lines.push("Target: " + report.input.targetVersion);
+    lines.push("Preset: " + report.preset);
+    lines.push("");
+
+    lines.push("ANALYSIS");
+    lines.push("-------");
+    lines.push("Files: " + report.analysis.stats.files);
+    lines.push("Text/code: " + report.analysis.stats.text);
+    lines.push("JSON: " + report.analysis.stats.json);
+    lines.push("MCFunction: " + report.analysis.stats.mcfunction);
+    lines.push("JS: " + report.analysis.stats.js);
+    lines.push("Dependency edges: " + report.analysis.dependencyEdges.length);
+    lines.push("Unused candidates: " + report.analysis.unusedCandidates.length);
+    lines.push("Dynamic JS: " + report.analysis.dynamicFiles.length);
+    lines.push("");
+
+    lines.push("SELECTION");
+    lines.push("---------");
+    lines.push("Selected: " + report.selection.selected);
+    lines.push("Deleted: " + report.selection.deleted);
+    lines.push("Optimized: " + report.selection.optimized);
+    lines.push("Review selected: " + report.selection.reviewSelected);
+    lines.push("Estimated content saving: " + formatSize(report.selection.estimatedSaved));
+    lines.push("");
+
+    lines.push("DECISIONS");
+    lines.push("---------");
+
+    report.decisions.forEach(function(d) {
+      lines.push(
+        "[" +
+        d.action.toUpperCase() +
+        "] " +
+        (d.selected ? "SELECTED " : "NOT-SELECTED ") +
+        d.archive +
+        " / " +
+        d.name +
+        " | " +
+        d.reason
+      );
+    });
+
+    lines.push("");
+    lines.push("INTEGRITY");
+    lines.push("---------");
+
+    if (!report.integrity) {
+      lines.push("Chưa Apply / chưa kiểm tra output.");
+    } else {
+      lines.push(
+        "Overall: " +
+        (report.integrity.ok ? "PASS" : "FAIL")
+      );
+
+      report.integrity.checks.forEach(function(c) {
+        lines.push(
+          (c.ok ? "OK " : "WARN/FAIL ") +
+          c.name +
+          ": " +
+          c.detail
+        );
+      });
+    }
+
+    lines.push("");
+    lines.push("Safety notes: no schema/API auto-conversion; no texture re-encoding; no automatic unused-asset deletion.");
+
+    return lines.join("\n");
+  }
+
+  btnReportJson.addEventListener("click", function() {
+    const report = buildReportData();
+
+    if (!report) return;
+
+    const base = originalFile
+      ? originalFile.name.replace(/\.[^.]+$/, "")
+      : "addon";
+
+    downloadTextFile(
+      base + "_Lite_Report_v2.0.json",
+      JSON.stringify(report, null, 2),
+      "application/json;charset=utf-8"
+    );
+
+    log("Đã xuất Report JSON.", "ok");
+  });
+
+  btnReportTxt.addEventListener("click", function() {
+    const report = buildReportData();
+
+    if (!report) return;
+
+    const base = originalFile
+      ? originalFile.name.replace(/\.[^.]+$/, "")
+      : "addon";
+
+    downloadTextFile(
+      base + "_Lite_Report_v2.0.txt",
+      reportToTxt(report),
+      "text/plain;charset=utf-8"
+    );
+
+    log("Đã xuất Report TXT.", "ok");
+  });
+
+  /*
+   * ------------------------------------------------------------
+   * APPLY
+   * ------------------------------------------------------------
+   */
+
+  btnApply.addEventListener("click", async function() {
+    if (!analysisResult || isProcessing) return;
+
+    const selected = countSelected();
+
+    if (selected <= 0) {
+      alert("Chưa chọn thay đổi nào.");
+      return;
+    }
+
+    const opId = beginOperation();
+
+    btnCancel.classList.remove("hidden");
+    btnAnalyze.disabled = true;
+    btnAI.disabled = true;
+    btnApply.disabled = true;
+
+    setStatus("Đang tạo bản Lite từ các mục đã chọn...");
+    log("=== APPLY v2.0 ===");
+    log("Mục được chọn: " + selected);
+    setProgress(4);
+
+    try {
+      const outZip = await rebuildOuterArchive(
+        analysisResult,
+        opId
+      );
+
+      checkAbort(opId);
+
+      setStatus("Đang nén archive Lite...");
+
+      const blob = await outZip.generateAsync(
+        {
+          type: "blob",
+          compression: "DEFLATE",
+          compressionOptions: {
+            level: 6
+          },
+          streamFiles: true
+        },
+        function(meta) {
+          if (
+            isCurrentOperation(opId) &&
+            !wasAborted
+          ) {
+            setProgress(
+              68 +
+              meta.percent * 0.18
+            );
+          }
+        }
+      );
+
+      checkAbort(opId);
+
+      if (!(blob instanceof Blob) || blob.size <= 0) {
+        throw new Error("Output blob rỗng.");
+      }
+
+      setStatus("Đang chạy Integrity Check...");
+      setProgress(88);
+
+      const integrity = await integrityCheck(
+        blob,
+        analysisResult,
+        opId
+      );
+
+      checkAbort(opId);
+
+      if (!integrity.ok) {
+        throw new Error(
+          "Integrity Check FAIL — không cho phép tải output."
+        );
+      }
+
+      const match = originalFile.name.match(
+        /\.(mcaddon|mcpack|zip)$/i
+      );
+
+      const ext = match ? match[0] : ".zip";
+      const baseName = originalFile.name.replace(
         /\.(mcaddon|mcpack|zip)$/i,
         ""
-      )+
-      "_Lite"+
-      (
-        originalFile.name.match(
-          /\.(mcaddon|mcpack|zip)$/i
-        )?.[0]||".zip"
       );
 
-    result.stats=
-      calculateStats(
-        result.decisions
-      );
+      const outputName =
+        baseName +
+        "_Lite" +
+        ext;
 
-    showFinalStats(
-      optimizedBlob,
-      result,
-      op
-    );
+      optimizedBlob = blob;
+      optimizedName = outputName;
+      lastIntegrity = integrity;
+      lastDiff = buildDiff(analysisResult);
+      reportData = buildReportData();
 
-    log(
-      "Output archive đã được kiểm tra.",
-      "ok"
-    );
+      const actualOriginalSize = originalSize;
+      const actualNewSize = blob.size;
+      const saved = actualOriginalSize - actualNewSize;
+      const pct = actualOriginalSize > 0
+        ? saved / actualOriginalSize * 100
+        : 0;
 
-    log(
-      "Xuất: "+optimizedName,
-      "ok"
-    );
+      const selectedSummary = getSelectedSummary();
 
-    setStatus(
-      "Sẵn sàng tải bản Lite.",
-      op
-    );
+      document.getElementById("sizeOrig").textContent =
+        formatSize(actualOriginalSize);
 
-    setProgress(100,op);
+      document.getElementById("sizeNew").textContent =
+        formatSize(actualNewSize);
 
-  }catch(error){
+      document.getElementById("sizeSaved").textContent =
+        (saved >= 0 ? "−" : "+") +
+        formatSize(Math.abs(saved)) +
+        " (" +
+        (pct >= 0 ? "−" : "+") +
+        Math.abs(pct).toFixed(1) +
+        "%)";
 
-    optimizedBlob=null;
-    optimizedName="";
+      document.getElementById("sizeStats").textContent =
+        (analysisResult.decisions.length - selectedSummary.deleted - selectedSummary.optimized - selectedSummary.reviewSelected) +
+        " giữ / " +
+        (selectedSummary.optimized + selectedSummary.reviewSelected) +
+        " optimize/review / " +
+        selectedSummary.deleted +
+        " xóa";
 
-    btnDownload.disabled=true;
-    btnDownload.classList.add("hidden");
+      renderDiff(lastDiff);
+      renderIntegrity(integrity);
 
-    if(isAbortError(error)){
+      sizeCard.classList.remove("hidden");
+      diffCard.classList.remove("hidden");
+      integrityCard.classList.remove("hidden");
+      reportCard.classList.remove("hidden");
+
+      btnDownload.classList.remove("hidden");
+      btnDownload.disabled = false;
+      btnRollback.classList.remove("hidden");
+      btnResetOutput.disabled = false;
+      btnReportJson.disabled = false;
+      btnReportTxt.disabled = false;
+
       log(
-        "Đã hủy Apply. Không commit output.",
-        "warn"
+        "Integrity Check PASS.",
+        "ok"
       );
 
-      setStatus("Đã hủy",op);
-
-    }else{
       log(
-        "Lỗi Apply: "+error.message,
+        "Hoàn tất: " +
+        formatSize(actualOriginalSize) +
+        " → " +
+        formatSize(actualNewSize) +
+        " (" +
+        (saved >= 0 ? "−" : "+") +
+        formatSize(Math.abs(saved)) +
+        ")",
+        "ok"
+      );
+
+      log("Output: " + optimizedName, "ok");
+
+      setProgress(100);
+      setStatus("Lite PASS Integrity — sẵn sàng tải.");
+    } catch (err) {
+      optimizedBlob = null;
+      optimizedName = "";
+
+      if (err.message === "Aborted") {
+        if (isCurrentOperation(opId)) {
+          log("Đã hủy tạo Lite", "warn");
+          setStatus("Đã hủy");
+        }
+      } else if (isCurrentOperation(opId)) {
+        console.error(err);
+        log("Lỗi Apply: " + err.message, "err");
+        setStatus("Lỗi — output không được cho tải");
+
+        btnDownload.disabled = true;
+        btnDownload.classList.add("hidden");
+        btnRollback.classList.add("hidden");
+      }
+    } finally {
+      if (isCurrentOperation(opId)) {
+        finishOperation(opId);
+        btnAnalyze.disabled = !originalFile;
+        btnAI.disabled = !originalFile;
+        btnApply.disabled = countSelected() === 0;
+      }
+    }
+  });
+
+  /*
+   * ------------------------------------------------------------
+   * DOWNLOAD
+   * ------------------------------------------------------------
+   */
+
+  btnDownload.addEventListener("click", function() {
+    if (
+      !optimizedBlob ||
+      !(optimizedBlob instanceof Blob) ||
+      optimizedBlob.size <= 0 ||
+      !optimizedName ||
+      !lastIntegrity ||
+      !lastIntegrity.ok
+    ) {
+      log(
+        "Không có output Lite hợp lệ / Integrity chưa PASS.",
         "err"
       );
-
-      setStatus(
-        "Lỗi — không tạo output.",
-        op
-      );
+      return;
     }
 
-  }finally{
+    const url = URL.createObjectURL(optimizedBlob);
+    const a = document.createElement("a");
 
-    if(activeOperation===op){
-      finishOperation(op);
+    a.href = url;
+    a.download = optimizedName;
 
-      btnAnalyze.disabled=!originalFile;
-      btnAI.disabled=!originalFile;
-      btnApply.disabled=!analysisResult;
+    document.body.appendChild(a);
+
+    try {
+      a.click();
+    } finally {
+      a.remove();
+
+      setTimeout(function() {
+        URL.revokeObjectURL(url);
+      }, 5000);
     }
-  }
-});
 
-
-/* =========================================================
-   FINAL STATS
-   ========================================================= */
-
-function showFinalStats(blob,result,op){
-  checkAbort(op);
-
-  const original=originalSize;
-  const current=blob.size;
-  const delta=original-current;
-
-  const percent=
-    original>0
-      ?Math.abs(delta/original*100)
-      :0;
-
-  document.getElementById("sizeOrig")
-    .textContent=
-      formatSize(original);
-
-  document.getElementById("sizeNew")
-    .textContent=
-      formatSize(current);
-
-  const savedEl=
-    document.getElementById("sizeSaved");
-
-  if(delta>0){
-    savedEl.textContent=
-      "−"+
-      formatSize(delta)+
-      " ("+
-      percent.toFixed(1)+
-      "%)";
-  }
-
-  else if(delta<0){
-    savedEl.textContent=
-      "+"+
-      formatSize(Math.abs(delta))+
-      " (archive lớn hơn "+
-      percent.toFixed(1)+
-      "%)";
-  }
-
-  else{
-    savedEl.textContent="0 B (0%)";
-  }
-
-  const stats=result.stats;
-
-  document.getElementById("sizeStats")
-    .textContent=
-      stats.keep+" giữ / "+
-      stats.optimize+" tối ưu / "+
-      stats.review+" review / "+
-      stats.delete+" xóa";
-
-  sizeCard.classList.remove("hidden");
-
-  btnDownload.classList.remove("hidden");
-
-  btnDownload.disabled=
-    !optimizedBlob||
-    optimizedBlob.size<=0;
-
-  if(delta<0){
     log(
-      "Archive sau tối ưu lớn hơn "+
-      formatSize(Math.abs(delta))+".",
-      "warn"
-    );
-  }
-
-  else if(delta>0){
-    log(
-      "Dung lượng archive thực tế giảm "+
-      formatSize(delta)+
-      " ("+
-      percent.toFixed(1)+
-      "%).",
+      "Đã tải: " +
+      optimizedName +
+      " (" +
+      formatSize(optimizedBlob.size) +
+      ")",
       "ok"
     );
+  });
+
+  /*
+   * ------------------------------------------------------------
+   * MANIFEST INSPECTION / REPORT SKELETON
+   * ------------------------------------------------------------
+   */
+
+  function rebuildReportSkeleton() {
+    reportData = buildReportData();
   }
 
-  else{
-    log(
-      "Dung lượng archive không đổi.",
-      "ok"
-    );
-  }
-}
+  /*
+   * ------------------------------------------------------------
+   * INITIALIZATION
+   * ------------------------------------------------------------
+   */
 
-
-/* =========================================================
-   DOWNLOAD
-   ========================================================= */
-
-btnDownload.addEventListener("click",()=>{
-  if(
-    !optimizedBlob||
-    !(optimizedBlob instanceof Blob)||
-    optimizedBlob.size<=0||
-    !optimizedName
-  ){
-    log(
-      "Không có output hợp lệ.",
-      "err"
-    );
-    return;
-  }
-
-  const url=
-    URL.createObjectURL(
-      optimizedBlob
-    );
-
-  const a=
-    document.createElement("a");
-
-  a.href=url;
-  a.download=optimizedName;
-
-  document.body.appendChild(a);
-
-  try{
-    a.click();
-  }finally{
-    a.remove();
-
-    setTimeout(()=>{
-      URL.revokeObjectURL(url);
-    },5000);
-  }
-
-  log(
-    "Đã yêu cầu tải "+
-    optimizedName+
-    " ("+
-    formatSize(optimizedBlob.size)+
-    ").",
-    "ok"
-  );
-});
+  setPreset("balanced");
+  setTargetVersion("1.26.30");
+  setStatus("Chưa có file");
 
 })();
 </script>
